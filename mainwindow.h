@@ -18,10 +18,10 @@ public:
     void initAlgorithm();
     void shiftQueue();
     void emptyBuffer();
-    bool fillReservationStationAdders(QString op, QString reg2, QString reg3);
-    bool fillReservationStationLoads(QString reg2, QString reg3);
-    bool fillReservationStationStores(QString reg1, QString reg2, QString reg3);
-    bool fillReservationStationMults(QString op, QString reg2, QString reg3);
+    bool fillReservationStationAdders(QString op, QString vj, QString vk);
+    bool fillReservationStationLoads(QString reg, QString addr1, QString addr2);
+    bool fillReservationStationStores(QString reg, QString addr1, QString addr2);
+    bool fillReservationStationMults(QString op, QString vj, QString vk);
 
 private slots:
     void on_compileButton_clicked();

@@ -6,6 +6,7 @@ ReservationStationMulDiv::ReservationStationMulDiv()
     this->op = "";
     this->vj = 0;
     this->vk = 0;
+    this->atCycle = 0;
 }
 
 void ReservationStationMulDiv::setBusy(bool busy)
@@ -28,6 +29,11 @@ void ReservationStationMulDiv::setVk(int vk)
     this->vk = vk;
 }
 
+void ReservationStationMulDiv::setAtCycle(int cycle)
+{
+    this->atCycle = cycle;
+}
+
 bool ReservationStationMulDiv::getBusy()
 {
     return busy;
@@ -46,4 +52,9 @@ int ReservationStationMulDiv::getVj()
 int ReservationStationMulDiv::getVk()
 {
     return vk;
+}
+
+int ReservationStationMulDiv::getAtCycle()
+{
+    return atCycle;
 }

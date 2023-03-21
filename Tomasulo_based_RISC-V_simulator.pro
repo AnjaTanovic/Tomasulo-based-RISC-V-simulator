@@ -12,6 +12,7 @@ SOURCES += \
     instruction.cpp \
     main.cpp \
     mainwindow.cpp \
+    register.cpp \
     reservationstationaddsub.cpp \
     reservationstationload.cpp \
     reservationstationmuldiv.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     instruction.h \
     mainwindow.h \
+    register.h \
     reservationstationaddsub.h \
     reservationstationload.h \
     reservationstationmuldiv.h \

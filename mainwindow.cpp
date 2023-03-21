@@ -4,6 +4,7 @@
 #include "reservationstationload.h"
 #include "reservationstationmuldiv.h"
 #include "reservationstationstore.h"
+#include "register.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QPainter>
@@ -12,6 +13,8 @@
 #define NUM_OF_LOAD_STATIONS 5
 #define NUM_OF_STORE_STATIONS 5
 #define NUM_OF_MULDIV_STATIONS 2
+
+#define NUM_OF_REGISTERS 4
 
 #define ADD_CLK_LATENCY 2
 #define SUB_CLK_LATENCY 2
@@ -23,7 +26,7 @@
 int algorithmStep = 0;
 QStringList instructionsString;
 QString code;
-int nextBufferInstruction = 0; //koja instrukcija iz grupe svih u kodu je sledeca na redu da se ubaci u bafer
+int nextBufferInstruction = 0; //which instruction from code is next to be inserted in buffer
 int nextInstruction = 0;
 int numberOfInstructions = 0;
 QList<Instruction> instructions;
@@ -31,6 +34,11 @@ QList<ReservationStationAddSub> stationsAddSub;
 QList<ReservationStationLoad> stationsLoad;
 QList<ReservationStationMulDiv> stationsMulDiv;
 QList<ReservationStationStore> stationsStore;
+QList<Register> registers;
+
+/********************************************************
+buffer = queue, use only one of them
+********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -66,6 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ReservationStationStore stStore;
         stationsStore.append(stStore);
+    }
+
+    //create registers
+    for (int i = 0; i < NUM_OF_REGISTERS; i++)
+    {
+        Register reg;
+        registers.append(reg);
     }
 }
 
@@ -169,7 +184,7 @@ void MainWindow::on_clkButton_clicked()
         if (instr.getOp() == "add" || instr.getOp() == "sub")
             stationNotBusy = fillReservationStationAdders(instr.getOp(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "ld")
-            stationNotBusy = fillReservationStationLoads(instr.getReg2(), instr.getReg3());
+            stationNotBusy = fillReservationStationLoads(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "sd")
             stationNotBusy = fillReservationStationStores(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else
@@ -178,17 +193,19 @@ void MainWindow::on_clkButton_clicked()
         /********************************************************
         Mark registers which have to get results (this can be done inside the fill rez stat functions)
         markRegisterBusy() or markMemoryElementBusy() (show in memory how element is still not written)
+        use registers[i].setBusy(true);
         ********************************************************/
 
         /********************************************************
-        Calcute reservations stations and forward results to everyone (regs and stations)
+        Calculate reservations stations and forward results to everyone (regs and stations)
         checkReservationStations();
         ********************************************************/
 
-        shiftQueue();
-
         if (stationNotBusy)
+        {
             nextInstruction++;
+            shiftQueue();
+        }
     }
     else
     {
@@ -286,26 +303,96 @@ void MainWindow::emptyBuffer()
 
 /********************************************************
 Following functions should fill labels in reservations stations
-It returns true if station is not busy, otherwise false
 Pay attention on register values (which values are ready)!!
 ********************************************************/
 
-bool MainWindow::fillReservationStationAdders(QString op, QString reg2, QString reg3)
+bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk)
+{
+    bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
+    QString label_name;
+    bool regBusy;
+    QLabel* targetLabel;
+
+    for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
+    {
+        if (stationsAddSub[i].getBusy() == false)
+        {
+            stationsAddSub[i].setBusy(true);
+            stationsAddSub[i].setOp(op);
+            stationsAddSub[i].setVj(vj.toInt());
+            stationsAddSub[i].setVk(vk.toInt());
+            stationsAddSub[i].setAtCycle(0); //cycle ++ when both operands are ready (in check res station func)
+
+            //show instruction on gui
+            //OPERATION
+            label_name = "addsOp_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            targetLabel->setText(op);
+
+            //OPERANDS
+
+            int regNumberJ = 0;
+            int regNumberK = 0;
+            /********************************************************
+            use regular expresions to take number of register
+            //register labels: f_0, f_1, f_2, f_3
+            regNumberJ = ...
+            regNumberK = ...
+
+            values in registers (setValue) is happening in check res station function)
+            here is only label writing
+            ********************************************************/
+            regBusy = registers[regNumberJ].getBusy();
+            label_name = "addsVj_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            if (regBusy)
+            {
+                //write only reg name (f1, f2 ...)
+                targetLabel->setText(vj);
+            }
+            else
+            {
+                //write value
+                targetLabel->setText(QString::number(registers[regNumberJ].getValue()));
+            }
+
+            label_name = "addsVk_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            regBusy = registers[regNumberK].getBusy();
+            if (regBusy)
+            {
+                //write only reg name (f1, f2 ...)
+                targetLabel->setText(vk);
+            }
+            else
+            {
+                //write value
+                targetLabel->setText(QString::number(registers[regNumberK].getValue()));
+            }
+
+
+            /********************************************************
+            regs can be replaced with immediate (do it later)
+            ********************************************************/
+
+            notBusy = true;
+            break;
+        }
+    }
+    return notBusy;
+}
+
+bool MainWindow::fillReservationStationLoads(QString reg, QString addr1, QString addr2)
 {
 
 }
 
-bool MainWindow::fillReservationStationLoads(QString reg2, QString reg3)
+bool MainWindow::fillReservationStationStores(QString reg, QString addr1, QString addr2)
 {
 
 }
 
-bool MainWindow::fillReservationStationStores(QString reg1, QString reg2, QString reg3)
-{
-
-}
-
-bool MainWindow::fillReservationStationMults(QString op, QString reg2, QString reg3)
+bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
 {
 
 }

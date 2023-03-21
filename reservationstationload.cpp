@@ -4,6 +4,7 @@ ReservationStationLoad::ReservationStationLoad()
 {
     this->busy = false;
     this->addr = 0;
+    this->atCycle = 0;
 }
 
 void ReservationStationLoad::setBusy(bool busy)
@@ -16,6 +17,11 @@ void ReservationStationLoad::setAddr(int addr)
     this->addr = addr;
 }
 
+void ReservationStationLoad::setAtCycle(int cycle)
+{
+    this->atCycle = cycle;
+}
+
 bool ReservationStationLoad::getBusy()
 {
     return busy;
@@ -24,4 +30,9 @@ bool ReservationStationLoad::getBusy()
 int ReservationStationLoad::getAddr()
 {
     return addr;
+}
+
+int ReservationStationLoad::getAtCycle()
+{
+    return atCycle;
 }
