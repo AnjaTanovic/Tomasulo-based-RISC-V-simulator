@@ -3,6 +3,8 @@
 ReservationStationLoad::ReservationStationLoad()
 {
     this->busy = false;
+    this->addrReg = "";
+    this->imm = "";
     this->addr = 0;
     this->atCycle = 0;
 }
@@ -10,6 +12,16 @@ ReservationStationLoad::ReservationStationLoad()
 void ReservationStationLoad::setBusy(bool busy)
 {
     this->busy = busy;
+}
+
+void ReservationStationLoad::setAddrReg(QString addrReg)
+{
+    this->addrReg = addrReg;
+}
+
+void ReservationStationLoad::setImm(QString imm)
+{
+    this->imm = imm;
 }
 
 void ReservationStationLoad::setAddr(int addr)
@@ -25,6 +37,16 @@ void ReservationStationLoad::setAtCycle(int cycle)
 bool ReservationStationLoad::getBusy()
 {
     return busy;
+}
+
+QString ReservationStationLoad::getAddrReg()
+{
+    return addrReg;
+}
+
+QString ReservationStationLoad::getImm()
+{
+    return imm;
 }
 
 int ReservationStationLoad::getAddr()

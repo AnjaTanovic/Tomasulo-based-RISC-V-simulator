@@ -4,8 +4,8 @@ ReservationStationMulDiv::ReservationStationMulDiv()
 {
     this->busy = false;
     this->op = "";
-    this->vj = 0;
-    this->vk = 0;
+    this->vj = "";
+    this->vk = "";
     this->atCycle = 0;
 }
 
@@ -19,12 +19,12 @@ void ReservationStationMulDiv::setOp(QString op)
     this->op = op;
 }
 
-void ReservationStationMulDiv::setVj(int vj)
+void ReservationStationMulDiv::setVj(QString vj)
 {
     this->vj = vj;
 }
 
-void ReservationStationMulDiv::setVk(int vk)
+void ReservationStationMulDiv::setVk(QString vk)
 {
     this->vk = vk;
 }
@@ -44,12 +44,12 @@ QString ReservationStationMulDiv::getOp()
     return op;
 }
 
-int ReservationStationMulDiv::getVj()
+QString ReservationStationMulDiv::getVj()
 {
     return vj;
 }
 
-int ReservationStationMulDiv::getVk()
+QString ReservationStationMulDiv::getVk()
 {
     return vk;
 }
@@ -57,4 +57,21 @@ int ReservationStationMulDiv::getVk()
 int ReservationStationMulDiv::getAtCycle()
 {
     return atCycle;
+}
+
+int ReservationStationMulDiv::calculate()
+{
+    int result;
+    if (op.toLower() == "mul")
+        result = vj.toInt() * vk.toInt();
+    else
+        result = vj.toInt() / vk.toInt();
+
+    busy = false;
+    op = "";
+    vj = "";
+    vk = "";
+    atCycle = 0;
+
+    return result;
 }

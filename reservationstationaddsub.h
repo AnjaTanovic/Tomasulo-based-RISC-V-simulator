@@ -8,19 +8,20 @@ public:
     ReservationStationAddSub();
     void setBusy(bool busy);
     void setOp(QString op);
-    void setVj(int vj);
-    void setVk(int vk);
+    void setVj(QString vj);
+    void setVk(QString vk);
     void setAtCycle(int cycle);
     bool getBusy();
     QString getOp();
-    int getVj();
-    int getVk();
+    QString getVj();
+    QString getVk();
     int getAtCycle();
+    int calculate();
 private:
     bool busy;
     QString op;
-    int vj;
-    int vk;
+    QString vj;
+    QString vk;
     int atCycle;
 };
 

@@ -17,11 +17,12 @@ public:
     void compileProgram();
     void initAlgorithm();
     void shiftQueue();
-    void emptyBuffer();
+    void cleanFields();
     bool fillReservationStationAdders(QString op, QString vj, QString vk);
-    bool fillReservationStationLoads(QString reg, QString addr1, QString addr2);
-    bool fillReservationStationStores(QString reg, QString addr1, QString addr2);
+    bool fillReservationStationLoads(QString addrReg, QString imm);
+    bool fillReservationStationStores(QString vj, QString addrReg, QString imm);
     bool fillReservationStationMults(QString op, QString vj, QString vk);
+    void resetStationsAndRegisters();
 
 private slots:
     void on_compileButton_clicked();
