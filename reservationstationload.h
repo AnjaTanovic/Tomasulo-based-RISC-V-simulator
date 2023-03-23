@@ -16,6 +16,7 @@ public:
     QString getImm();
     int getAddr();
     int getAtCycle();
+    void read();
 private:
     bool busy;
     QString addrReg;

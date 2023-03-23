@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1312</width>
-    <height>762</height>
+    <width>1317</width>
+    <height>825</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QTextEdit" name="textEdit">
+            <widget class="QTextEdit" name="codeTextEdit">
              <property name="font">
               <font>
                <family>Courier New</family>
@@ -202,10 +202,10 @@
    <widget class="QLabel" name="picture_label">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>450</x>
       <y>10</y>
       <width>821</width>
-      <height>711</height>
+      <height>701</height>
      </rect>
     </property>
     <property name="text">
@@ -378,7 +378,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>570</y>
+      <y>560</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -391,7 +391,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>550</y>
+      <y>540</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -404,7 +404,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>530</y>
+      <y>520</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -417,7 +417,7 @@
     <property name="geometry">
      <rect>
       <x>770</x>
-      <y>570</y>
+      <y>560</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -430,7 +430,7 @@
     <property name="geometry">
      <rect>
       <x>770</x>
-      <y>550</y>
+      <y>540</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -443,7 +443,7 @@
     <property name="geometry">
      <rect>
       <x>770</x>
-      <y>530</y>
+      <y>520</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -456,7 +456,7 @@
     <property name="geometry">
      <rect>
       <x>840</x>
-      <y>570</y>
+      <y>560</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -469,7 +469,7 @@
     <property name="geometry">
      <rect>
       <x>840</x>
-      <y>550</y>
+      <y>540</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -482,7 +482,7 @@
     <property name="geometry">
      <rect>
       <x>840</x>
-      <y>530</y>
+      <y>520</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -673,6 +673,16 @@
      <string>TextLabel</string>
     </property>
    </widget>
+   <widget class="QTextEdit" name="memTextEdit">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>680</y>
+      <width>191</width>
+      <height>91</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>picture_label</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>load_0</zorder>
@@ -715,13 +725,14 @@
    <zorder>storeReg_2</zorder>
    <zorder>storeReg_3</zorder>
    <zorder>storeReg_4</zorder>
+   <zorder>memTextEdit</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1312</width>
+     <width>1317</width>
      <height>26</height>
     </rect>
    </property>

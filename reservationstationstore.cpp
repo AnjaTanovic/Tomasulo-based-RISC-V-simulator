@@ -69,3 +69,13 @@ int ReservationStationStore::getAtCycle()
 {
     return atCycle;
 }
+
+void ReservationStationStore::write()
+{
+    busy = false;
+    addrReg = "";
+    imm = "";
+    addr = 0;
+    vj = "";
+    atCycle = 0;
+}

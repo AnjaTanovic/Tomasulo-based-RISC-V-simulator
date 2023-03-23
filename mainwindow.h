@@ -18,10 +18,14 @@ public:
     void initAlgorithm();
     void shiftQueue();
     void cleanFields();
-    bool fillReservationStationAdders(QString op, QString vj, QString vk);
-    bool fillReservationStationLoads(QString addrReg, QString imm);
+    bool fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk);
+    bool fillReservationStationLoads(QString resReg, QString addrReg, QString imm);
     bool fillReservationStationStores(QString vj, QString addrReg, QString imm);
-    bool fillReservationStationMults(QString op, QString vj, QString vk);
+    bool fillReservationStationMults(QString op, QString resReg, QString vj, QString vk);
+    void markRegisterBusy(QString reg, QString station);
+    void unmarkRegisterBusy(QString reg);
+    void markMemoryElementBusy(QString address);
+    void unmarkMemoryElementBusy(QString address);
     void resetStationsAndRegisters();
 
 private slots:

@@ -25,9 +25,15 @@
 #define MUL_CLK_LATENCY 10
 #define DIV_CLK_LATENCY 40
 
+#define ADDS_STATIONS_NAME "adds_"
+#define LOADS_STATIONS_NAME "loads_"
+#define STORES_STATIONS_NAME "stores_"
+#define MULTS_STATIONS_NAME "mults_"
+
 int algorithmStep = 0;
 QStringList instructionsString;
 QString code;
+QString memText;
 int nextQueueInstruction = 0; //which instruction from code is next to be inserted in queue
 int nextInstruction = 0;
 int numberOfInstructions = 0;
@@ -100,8 +106,9 @@ void MainWindow::on_compileButton_clicked()
 
 void MainWindow::compileProgram()
 {
-    code = ui->textEdit->toPlainText();
+    code = ui->codeTextEdit->toPlainText();
     nextInstruction = 0;
+    instructions.clear();
 
     /********************************************************
     Make compiling correct with 1 or 0 lines of code!!!
@@ -142,12 +149,12 @@ void MainWindow::compileProgram()
         textEdit.cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, 1);
         extraSelections.append(textEdit);
 
-        ui->textEdit->setExtraSelections(extraSelections);
-        ui->textEdit->show();
-        //ui->textEdit->insertPlainText("Hello");
-        //ui->textEdit->append("Anja");
+        ui->codeTextEdit->setExtraSelections(extraSelections);
+        ui->codeTextEdit->show();
+        //ui->codeTextEdit->insertPlainText("Hello");
+        //ui->codeTextEdit->append("Anja");
         //qDebug() << "Underlined";
-        //ui->textEdit->setTextColor(Qt::red);
+        //ui->codeTextEdit->setTextColor(Qt::red);
 
         /********************************************************
         Code above is not working.
@@ -186,19 +193,21 @@ void MainWindow::on_clkButton_clicked()
 
         bool stationNotBusy;
         if (instr.getOp() == "add" || instr.getOp() == "sub")
-            stationNotBusy = fillReservationStationAdders(instr.getOp(), instr.getReg2(), instr.getReg3());
+            stationNotBusy = fillReservationStationAdders(instr.getOp(), instr.getReg1(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "ld")
-            stationNotBusy = fillReservationStationLoads(instr.getReg2(), instr.getReg3());
+            stationNotBusy = fillReservationStationLoads(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "sd")
             stationNotBusy = fillReservationStationStores(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else
-            stationNotBusy = fillReservationStationMults(instr.getOp(), instr.getReg2(), instr.getReg3());
+            stationNotBusy = fillReservationStationMults(instr.getOp(), instr.getReg1(), instr.getReg2(), instr.getReg3());
 
         /********************************************************
         Mark registers which have to get results (this can be done inside the fill rez stat functions)
         markRegisterBusy() or markMemoryElementBusy() (show in memory how element is still not written)
         use registers[i].setBusy(true);
         ********************************************************/
+
+        //markMemoryElementBusy(); in store function!!
 
         /********************************************************
         Calculate reservations stations and forward results to everyone (regs and stations)
@@ -246,7 +255,6 @@ void MainWindow::initAlgorithm()
     if(instructionsString.size() > 5)
         ui->queue_5->setText(instructionsString[5]);
 
-
     if(numberOfInstructions > 6)
         nextQueueInstruction = 6;
     else
@@ -291,6 +299,7 @@ void MainWindow::on_startButton_clicked()
 {
     resetStationsAndRegisters();
     cleanFields();
+    memText = "";
     initAlgorithm();
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(true);
@@ -301,72 +310,75 @@ void MainWindow::on_resetButton_clicked()
 {
     cleanFields();
     nextInstruction = 0;
+    memText = "";
+    code = "";
     ui->startButton->setEnabled(true);
     ui->clkButton->setEnabled(false);
-
 }
 
 void MainWindow::cleanFields()
 {
-    QString label_name;
+    QString labelName;
     QLabel* targetLabel;
 
     for (int i = 0; i < QUEUE_SIZE; i++)
     {
-        label_name = "queue_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "queue_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
 
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
     {
-        label_name = "addsOp_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "addsOp_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
-        label_name = "addsVj_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "addsVj_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
-        label_name = "addsVk_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "addsVk_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
-        label_name = "load_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "load_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
 
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
-        label_name = "mulsOp_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "mulsOp_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
-        label_name = "mulsVj_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "mulsVj_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
-        label_name = "mulsVk_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "mulsVk_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
 
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
     {
-        label_name = "storeReg_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "storeReg_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
-        label_name = "storeAddr_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "storeAddr_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
 
     for (int i = 0; i < NUM_OF_REGISTERS; i++)
     {
-        label_name = "f_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+        labelName = "f_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText(QString::number(registers[i].getValue()));
     }
+
+    ui->memTextEdit->setText("");
 }
 
 /********************************************************
@@ -374,10 +386,10 @@ Following functions should fill labels in reservations stations
 Pay attention on register values (which values are ready)!!
 ********************************************************/
 
-bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk)
+bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    QString label_name;
+    QString labelName;
     bool regBusy;
     QLabel* targetLabel;
 
@@ -391,8 +403,8 @@ bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk
 
             //show instruction on gui
             //OPERATION
-            label_name = "addsOp_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "addsOp_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(op);
 
             //OPERANDS
@@ -409,8 +421,8 @@ bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk
             here is only label writing
             ********************************************************/
             regBusy = registers[regNumberJ].getBusy();
-            label_name = "addsVj_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "addsVj_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             if (regBusy)
             {
                 //write only reg name (f1, f2 ...)
@@ -423,8 +435,8 @@ bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk
                 stationsAddSub[i].setVj(QString::number(registers[regNumberJ].getValue()));
             }
 
-            label_name = "addsVk_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "addsVk_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             regBusy = registers[regNumberK].getBusy();
             if (regBusy)
             {
@@ -443,16 +455,20 @@ bool MainWindow::fillReservationStationAdders(QString op, QString vj, QString vk
             ********************************************************/
 
             notBusy = true;
+
+            QString stationName = ADDS_STATIONS_NAME + QString::number(i);
+            markRegisterBusy(resReg, stationName);
+
             break;
         }
     }
     return notBusy;
 }
 
-bool MainWindow::fillReservationStationLoads(QString addrReg, QString imm)
+bool MainWindow::fillReservationStationLoads(QString resReg, QString addrReg, QString imm)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    QString label_name;
+    QString labelName;
     bool regBusy;
     QLabel* targetLabel;
 
@@ -479,8 +495,8 @@ bool MainWindow::fillReservationStationLoads(QString addrReg, QString imm)
             here is only label writing
             ********************************************************/
             regBusy = registers[regNumber].getBusy();
-            label_name = "load_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "load_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             if (regBusy)
             {
                 //write reg name
@@ -494,6 +510,10 @@ bool MainWindow::fillReservationStationLoads(QString addrReg, QString imm)
             }
 
             notBusy = true;
+
+            QString stationName = LOADS_STATIONS_NAME + QString::number(i);
+            markRegisterBusy(resReg, stationName);
+
             break;
         }
     }
@@ -503,7 +523,7 @@ bool MainWindow::fillReservationStationLoads(QString addrReg, QString imm)
 bool MainWindow::fillReservationStationStores(QString vj, QString addrReg, QString imm)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    QString label_name;
+    QString labelName;
     bool regBusy;
     QLabel* targetLabel;
 
@@ -531,22 +551,24 @@ bool MainWindow::fillReservationStationStores(QString vj, QString addrReg, QStri
             here is only label writing
             ********************************************************/
             regBusy = registers[regNumber].getBusy();
-            label_name = "storeAddr_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "storeAddr_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             if (regBusy)
             {
                 //write reg name
                 targetLabel->setText(imm + "(" + addrReg + ")");
+                markMemoryElementBusy(imm + "(" + addrReg + ")");
             }
             else
             {
                 //calculate address and write value
                 stationsStore[i].setAddr(imm.toInt() + registers[regNumber].getValue());
                 targetLabel->setText(QString::number(stationsStore[i].getAddr()));
+                markMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
             }
             regBusy = registers[regNumberJ].getBusy();
-            label_name = "storeReg_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "storeReg_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             if (regBusy)
             {
                 //write only reg name (f1, f2 ...)
@@ -558,17 +580,19 @@ bool MainWindow::fillReservationStationStores(QString vj, QString addrReg, QStri
                 targetLabel->setText(QString::number(registers[regNumberJ].getValue()));
                 stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
             }
+
             notBusy = true;
+
             break;
         }
     }
     return notBusy;
 }
 
-bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
+bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString vj, QString vk)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    QString label_name;
+    QString labelName;
     bool regBusy;
     QLabel* targetLabel;
 
@@ -582,8 +606,8 @@ bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
 
             //show instruction on gui
             //OPERATION
-            label_name = "mulsOp_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "mulsOp_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(op);
 
             //OPERANDS
@@ -600,8 +624,8 @@ bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
             here is only label writing
             ********************************************************/
             regBusy = registers[regNumberJ].getBusy();
-            label_name = "mulsVj_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "mulsVj_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             if (regBusy)
             {
                 //write only reg name (f1, f2 ...)
@@ -614,8 +638,8 @@ bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
                 stationsMulDiv[i].setVj(QString::number(registers[regNumberJ].getValue()));
             }
 
-            label_name = "mulsVk_" + QString::number(i);
-            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(label_name);
+            labelName = "mulsVk_" + QString::number(i);
+            targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             regBusy = registers[regNumberK].getBusy();
             if (regBusy)
             {
@@ -635,10 +659,63 @@ bool MainWindow::fillReservationStationMults(QString op, QString vj, QString vk)
             ********************************************************/
 
             notBusy = true;
+
+            QString stationName = MULTS_STATIONS_NAME + QString::number(i);
+            markRegisterBusy(resReg, stationName);
+
             break;
         }
     }
     return notBusy;
+}
+
+void MainWindow::markRegisterBusy(QString reg, QString station)
+{
+    int regNumber = 0;
+    /********************************************************
+    use regular expresions to take number of register
+    //register labels: f_0, f_1, f_2, f_3
+    regNumber = ...
+    ********************************************************/
+    registers[regNumber].setBusy(true);
+    registers[regNumber].setStation(station);
+}
+
+void MainWindow::unmarkRegisterBusy(QString reg)
+{
+    int regNumber = 0;
+    /********************************************************
+    use regular expresions to take number of register
+    //register labels: f_0, f_1, f_2, f_3
+    regNumber = ...
+    ********************************************************/
+    registers[regNumber].setBusy(false);
+    registers[regNumber].setStation("");
+}
+
+void MainWindow::markMemoryElementBusy(QString address)
+{
+    //only load needs to check ih memory element is busy (called before read method of class ReservationStationLoad)
+    //if it is busy, wait untill element is stable, and then load it in register
+    memText.append("Location " + address + " is busy.\n");
+    ui->memTextEdit->setText(memText);
+}
+
+void MainWindow::unmarkMemoryElementBusy(QString address)
+{
+    memText = ui->memTextEdit->toPlainText();
+
+    QStringList memString = memText.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QString newMemText;
+    for (int i = 0; i < memString.size(); i++)
+    {
+        if (memString[i].compare("Location " + address + " is busy.") == 0)
+        {
+            newMemText.append(memString[i]);
+        }
+    }
+    memText = newMemText;
+    ui->memTextEdit->setText(memText);
 }
 
 void MainWindow::resetStationsAndRegisters()

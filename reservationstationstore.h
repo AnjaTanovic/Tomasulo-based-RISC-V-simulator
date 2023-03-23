@@ -18,6 +18,7 @@ public:
     int getAddr();
     QString getVj();
     int getAtCycle();
+    void write();
 private:
     bool busy;
     QString addrReg;

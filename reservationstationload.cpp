@@ -58,3 +58,12 @@ int ReservationStationLoad::getAtCycle()
 {
     return atCycle;
 }
+
+void ReservationStationLoad::read()
+{
+    busy = false;
+    addrReg = "";
+    imm = "";
+    addr = 0;
+    atCycle = 0;
+}
