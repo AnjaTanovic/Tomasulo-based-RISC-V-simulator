@@ -19,8 +19,8 @@ public:
     void shiftQueue();
     void cleanFields();
     bool fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk);
-    bool fillReservationStationLoads(QString resReg, QString addrReg, QString imm);
-    bool fillReservationStationStores(QString vj, QString addrReg, QString imm);
+    bool fillReservationStationLoads(QString resReg, QString imm, QString addrReg);
+    bool fillReservationStationStores(QString vj, QString imm, QString addrReg);
     bool fillReservationStationMults(QString op, QString resReg, QString vj, QString vk);
     void markRegisterBusy(QString reg, QString station);
     void unmarkRegisterBusy(QString reg);

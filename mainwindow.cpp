@@ -8,6 +8,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QPainter>
+#include <QRegularExpression>
 
 #define NUM_OF_ADDSUB_STATIONS 3
 #define NUM_OF_LOAD_STATIONS 5
@@ -101,7 +102,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_compileButton_clicked()
 {
     compileProgram();
-    ui->resetButton->setEnabled(true);
 }
 
 void MainWindow::compileProgram()
@@ -118,21 +118,54 @@ void MainWindow::compileProgram()
     numberOfInstructions = instructionsString.size();
     qDebug() << "Number of instructions: " << numberOfInstructions;
 
-    QStringList instructionParts;
     bool correctCode = true;
     //Check format!
     for (int i = 0; i < instructionsString.size(); i++)
     {
-        /********************************************************
-        INSERT REGULAR EXPRESSIONS!!
-        ********************************************************/
-        instructionParts = instructionsString[i].split(QLatin1Char(','), Qt::SkipEmptyParts);
+        QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div)\\s+([fF][0-3]),\\s*([fF][0-3]),\\s*([fF][0-3])\\s*$");
+        QRegularExpression regularInstruction2("^\\s*(sd|ld)\\s+([fF][0-3]),\\s*([0-9]+),\\s*([fF][0-3])\\s*$");
+        QRegularExpression regularInstruction3("^\\s*(sd|ld)\\s+([fF][0-3]),\\s*([0-9]+)[(]\\s*([fF][0-3])\\s*[)]\\s*$");
+
+        if (regularInstruction1.match(instructionsString[i]).hasMatch())
+        {
+
+            Instruction instr(regularInstruction1.match(instructionsString[i]).captured(1),
+                              regularInstruction1.match(instructionsString[i]).captured(2),
+                              regularInstruction1.match(instructionsString[i]).captured(3),
+                              regularInstruction1.match(instructionsString[i]).captured(4));
+            instructions.append(instr);
+
+            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+        }
+        else if (regularInstruction2.match(instructionsString[i]).hasMatch())
+        {
+            Instruction instr(regularInstruction2.match(instructionsString[i]).captured(1),
+                              regularInstruction2.match(instructionsString[i]).captured(2),
+                              regularInstruction2.match(instructionsString[i]).captured(3),
+                              regularInstruction2.match(instructionsString[i]).captured(4));
+            instructions.append(instr);
+
+            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+        }
+        else if (regularInstruction3.match(instructionsString[i]).hasMatch())
+        {
+            Instruction instr(regularInstruction3.match(instructionsString[i]).captured(1),
+                              regularInstruction3.match(instructionsString[i]).captured(2),
+                              regularInstruction3.match(instructionsString[i]).captured(3),
+                              regularInstruction3.match(instructionsString[i]).captured(4));
+            instructions.append(instr);
+
+            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+        }
+        else
+        {
+            qDebug() << "Instruction number " + QString::number(i) + " is NOT correct!!!";
+            correctCode = false;
+        }
+
 
         /********************************************************
-        Check if input command is in correct format!!!
-        example: operations which are not supported, registers which does not exist..
-        if command line is not correct mark it red
-        set variable correctCode on false if at least one line is not ok
+        If command line is not correct mark it red
         ********************************************************/
 
         QList<QTextEdit::ExtraSelection> extraSelections;
@@ -161,19 +194,13 @@ void MainWindow::compileProgram()
         Try with changing whole string and print it again
         with append
         ********************************************************/
-
-        if (correctCode)
-        {
-            //Instruction instr("add", "f1", "f2", "f3");
-            Instruction instr(instructionParts[0], instructionParts[1], instructionParts[2], instructionParts[3]);
-            instructions.append(instr);
-        }
     }
     if (correctCode)
     {
         ui->compile_label->setText("Code is compiled successfuly.");
         ui->startButton->setEnabled(true);
         ui->clkButton->setEnabled(false);
+        ui->resetButton->setEnabled(true);
     }
     else
     {
@@ -411,15 +438,15 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
 
             int regNumberJ = 0;
             int regNumberK = 0;
-            /********************************************************
-            use regular expresions to take number of register
-            //register labels: f_0, f_1, f_2, f_3
-            regNumberJ = ...
-            regNumberK = ...
+            QRegularExpression regularRegister("^[fF]([0-3])$");
+            if (regularRegister.match(vj).hasMatch() && regularRegister.match(vk).hasMatch())
+            {
+                regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
+                regNumberK = (regularRegister.match(vk).captured(1)).toInt();
+            }
+            else
+                qDebug() << "Problem with registers in instructions.";
 
-            values in registers (setValue) is happening in check res station function)
-            here is only label writing
-            ********************************************************/
             regBusy = registers[regNumberJ].getBusy();
             labelName = "addsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
@@ -465,7 +492,7 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
     return notBusy;
 }
 
-bool MainWindow::fillReservationStationLoads(QString resReg, QString addrReg, QString imm)
+bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
     QString labelName;
@@ -486,14 +513,14 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString addrReg, QS
             //ADDRESS REGISTER
 
             int regNumber = 0;
-            /********************************************************
-            use regular expresions to take number of register
-            //register labels: f_0, f_1, f_2, f_3
-            regNumber = ...
+            QRegularExpression regularRegister("^[fF]([0-3])$");
+            if (regularRegister.match(addrReg).hasMatch())
+            {
+                regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
+            }
+            else
+                qDebug() << "Problem with registers in instructions.";
 
-            values in registers (setValue) is happening in check res station function)
-            here is only label writing
-            ********************************************************/
             regBusy = registers[regNumber].getBusy();
             labelName = "load_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
@@ -505,8 +532,8 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString addrReg, QS
             else
             {
                 //calculate address and write value
-                targetLabel->setText(QString::number(stationsLoad[i].getAddr()));
                 stationsLoad[i].setAddr(imm.toInt() + registers[regNumber].getValue());
+                targetLabel->setText(QString::number(stationsLoad[i].getAddr()));
             }
 
             notBusy = true;
@@ -520,7 +547,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString addrReg, QS
     return notBusy;
 }
 
-bool MainWindow::fillReservationStationStores(QString vj, QString addrReg, QString imm)
+bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
     QString labelName;
@@ -542,14 +569,15 @@ bool MainWindow::fillReservationStationStores(QString vj, QString addrReg, QStri
 
             int regNumber = 0;
             int regNumberJ = 0;
-            /********************************************************
-            use regular expresions to take number of register
-            //register labels: f_0, f_1, f_2, f_3
-            regNumber = ...
+            QRegularExpression regularRegister("^[fF]([0-3])$");
+            if (regularRegister.match(addrReg).hasMatch() && regularRegister.match(vj).hasMatch())
+            {
+                regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
+                regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
+            }
+            else
+                qDebug() << "Problem with registers in instructions.";
 
-            values in registers (setValue) is happening in check res station function)
-            here is only label writing
-            ********************************************************/
             regBusy = registers[regNumber].getBusy();
             labelName = "storeAddr_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
@@ -614,15 +642,15 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 
             int regNumberJ = 0;
             int regNumberK = 0;
-            /********************************************************
-            use regular expresions to take number of register
-            //register labels: f_0, f_1, f_2, f_3
-            regNumberJ = ...
-            regNumberK = ...
+            QRegularExpression regularRegister("^[fF]([0-3])$");
+            if (regularRegister.match(vj).hasMatch() && regularRegister.match(vk).hasMatch())
+            {
+                regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
+                regNumberK = (regularRegister.match(vk).captured(1)).toInt();
+            }
+            else
+                qDebug() << "Problem with registers in instructions.";
 
-            values in registers (setValue) is happening in check res station function)
-            here is only label writing
-            ********************************************************/
             regBusy = registers[regNumberJ].getBusy();
             labelName = "mulsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
@@ -672,11 +700,14 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 void MainWindow::markRegisterBusy(QString reg, QString station)
 {
     int regNumber = 0;
-    /********************************************************
-    use regular expresions to take number of register
-    //register labels: f_0, f_1, f_2, f_3
-    regNumber = ...
-    ********************************************************/
+    QRegularExpression regularRegister("^[fF]([0-3])$");
+    if (regularRegister.match(reg).hasMatch())
+    {
+        regNumber = (regularRegister.match(reg).captured(1)).toInt();
+    }
+    else
+        qDebug() << "Problem with registers in instructions.";
+
     registers[regNumber].setBusy(true);
     registers[regNumber].setStation(station);
 }
@@ -684,11 +715,14 @@ void MainWindow::markRegisterBusy(QString reg, QString station)
 void MainWindow::unmarkRegisterBusy(QString reg)
 {
     int regNumber = 0;
-    /********************************************************
-    use regular expresions to take number of register
-    //register labels: f_0, f_1, f_2, f_3
-    regNumber = ...
-    ********************************************************/
+    QRegularExpression regularRegister("^[fF]([0-3])$");
+    if (regularRegister.match(reg).hasMatch())
+    {
+        regNumber = (regularRegister.match(reg).captured(1)).toInt();
+    }
+    else
+        qDebug() << "Problem with registers in instructions.";
+
     registers[regNumber].setBusy(false);
     registers[regNumber].setStation("");
 }
