@@ -6,7 +6,9 @@ ReservationStationAddSub::ReservationStationAddSub()
     this->op = "";
     this->vj = "";
     this->vk = "";
+    this->resReg = "";
     this->atCycle = 0;
+    this->working = false;
 }
 
 void ReservationStationAddSub::setBusy(bool busy)
@@ -29,9 +31,19 @@ void ReservationStationAddSub::setVk(QString vk)
     this->vk = vk;
 }
 
+void ReservationStationAddSub::setResReg(QString resReg)
+{
+    this->resReg = resReg;
+}
+
 void ReservationStationAddSub::setAtCycle(int cycle)
 {
     this->atCycle = cycle;
+}
+
+void ReservationStationAddSub::setWorking(bool working)
+{
+    this->working = working;
 }
 
 bool ReservationStationAddSub::getBusy()
@@ -54,9 +66,19 @@ QString ReservationStationAddSub::getVk()
     return vk;
 }
 
+QString ReservationStationAddSub::getResReg()
+{
+    return resReg;
+}
+
 int ReservationStationAddSub::getAtCycle()
 {
     return atCycle;
+}
+
+bool ReservationStationAddSub::getWorking()
+{
+    return working;
 }
 
 int ReservationStationAddSub::calculate()
@@ -71,7 +93,9 @@ int ReservationStationAddSub::calculate()
     op = "";
     vj = "";
     vk = "";
+    resReg = "";
     atCycle = 0;
+    working = false;
 
     return result;
 }

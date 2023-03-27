@@ -17,9 +17,9 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>24</y>
-      <width>344</width>
+      <x>20</x>
+      <y>20</y>
+      <width>301</width>
       <height>581</height>
      </rect>
     </property>
@@ -683,6 +683,31 @@
      </rect>
     </property>
    </widget>
+   <widget class="QTableWidget" name="memoryTable">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>20</y>
+      <width>121</width>
+      <height>581</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="tabKeyNavigation">
+     <bool>true</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::NoSelection</enum>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>picture_label</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>load_0</zorder>
@@ -726,6 +751,7 @@
    <zorder>storeReg_3</zorder>
    <zorder>storeReg_4</zorder>
    <zorder>memTextEdit</zorder>
+   <zorder>memoryTable</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

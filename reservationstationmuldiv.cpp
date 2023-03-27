@@ -6,7 +6,9 @@ ReservationStationMulDiv::ReservationStationMulDiv()
     this->op = "";
     this->vj = "";
     this->vk = "";
+    this->resReg = "";
     this->atCycle = 0;
+    this->working = false;
 }
 
 void ReservationStationMulDiv::setBusy(bool busy)
@@ -29,9 +31,19 @@ void ReservationStationMulDiv::setVk(QString vk)
     this->vk = vk;
 }
 
+void ReservationStationMulDiv::setResReg(QString resReg)
+{
+    this->resReg = resReg;
+}
+
 void ReservationStationMulDiv::setAtCycle(int cycle)
 {
     this->atCycle = cycle;
+}
+
+void ReservationStationMulDiv::setWorking(bool working)
+{
+    this->working = working;
 }
 
 bool ReservationStationMulDiv::getBusy()
@@ -54,9 +66,19 @@ QString ReservationStationMulDiv::getVk()
     return vk;
 }
 
+QString ReservationStationMulDiv::getResReg()
+{
+    return resReg;
+}
+
 int ReservationStationMulDiv::getAtCycle()
 {
     return atCycle;
+}
+
+bool ReservationStationMulDiv::getWorking()
+{
+    return working;
 }
 
 int ReservationStationMulDiv::calculate()
@@ -71,7 +93,9 @@ int ReservationStationMulDiv::calculate()
     op = "";
     vj = "";
     vk = "";
+    resReg = "";
     atCycle = 0;
+    working = false;
 
     return result;
 }

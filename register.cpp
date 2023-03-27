@@ -4,7 +4,6 @@ Register::Register()
 {
     this->value = 0;
     this->busy = false;
-    this->station = "";
 }
 
 void Register::setValue(int value)
@@ -17,11 +16,6 @@ void Register::setBusy(bool busy)
     this->busy = busy;
 }
 
-void Register::setStation(QString station)
-{
-    this->station = station;
-}
-
 int Register::getValue()
 {
     return value;
@@ -30,9 +24,4 @@ int Register::getValue()
 bool Register::getBusy()
 {
     return busy;
-}
-
-QString Register::getStation()
-{
-    return station;
 }

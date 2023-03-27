@@ -22,10 +22,12 @@ public:
     bool fillReservationStationLoads(QString resReg, QString imm, QString addrReg);
     bool fillReservationStationStores(QString vj, QString imm, QString addrReg);
     bool fillReservationStationMults(QString op, QString resReg, QString vj, QString vk);
-    void markRegisterBusy(QString reg, QString station);
-    void unmarkRegisterBusy(QString reg);
+    void checkReservationStations();
+    void markRegisterBusy(QString reg);
     void markMemoryElementBusy(QString address);
     void unmarkMemoryElementBusy(QString address);
+    void showRegValues();
+    void showMemory();
     void resetStationsAndRegisters();
 
 private slots:

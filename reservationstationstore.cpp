@@ -8,6 +8,7 @@ ReservationStationStore::ReservationStationStore()
     this->addr = 0;
     this->vj = "";
     this->atCycle = 0;
+    this->working = false;
 }
 
 void ReservationStationStore::setBusy(bool busy)
@@ -40,6 +41,11 @@ void ReservationStationStore::setAtCycle(int cycle)
     this->atCycle = cycle;
 }
 
+void ReservationStationStore::setWorking(bool working)
+{
+    this->working = working;
+}
+
 bool ReservationStationStore::getBusy()
 {
     return busy;
@@ -70,6 +76,11 @@ int ReservationStationStore::getAtCycle()
     return atCycle;
 }
 
+bool ReservationStationStore::getWorking()
+{
+    return working;
+}
+
 void ReservationStationStore::write()
 {
     busy = false;
@@ -78,4 +89,5 @@ void ReservationStationStore::write()
     addr = 0;
     vj = "";
     atCycle = 0;
+    working = false;
 }

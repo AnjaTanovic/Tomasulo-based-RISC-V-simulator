@@ -10,19 +10,25 @@ public:
     void setOp(QString op);
     void setVj(QString vj);
     void setVk(QString vk);
+    void setResReg(QString resReg);
     void setAtCycle(int cycle);
+    void setWorking(bool working);
     bool getBusy();
     QString getOp();
     QString getVj();
     QString getVk();
+    QString getResReg();
     int getAtCycle();
+    bool getWorking();
     int calculate();
 private:
     bool busy;
     QString op;
     QString vj;
     QString vk;
+    QString resReg;
     int atCycle;
+    bool working;
 };
 
 #endif // RESERVATIONSTATIONADDSUB_H
