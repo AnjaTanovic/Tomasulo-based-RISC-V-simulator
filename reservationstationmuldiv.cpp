@@ -1,4 +1,5 @@
 #include "reservationstationmuldiv.h"
+#include "qdebug.h"
 
 ReservationStationMulDiv::ReservationStationMulDiv()
 {
@@ -84,10 +85,18 @@ bool ReservationStationMulDiv::getWorking()
 int ReservationStationMulDiv::calculate()
 {
     int result;
-    if (op.toLower() == "mul")
+    if (op == "mul")
         result = vj.toInt() * vk.toInt();
     else
-        result = vj.toInt() / vk.toInt();
+    {
+        if (vk.toInt() != 0)
+            result = vj.toInt() / vk.toInt();
+        else
+        {
+            result = 0;
+            qDebug() << "Division by zero is not allowed.";
+        }
+    }
 
     busy = false;
     op = "";

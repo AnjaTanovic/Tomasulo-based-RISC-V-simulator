@@ -27,6 +27,7 @@ public:
     void markMemoryElementBusy(QString address);
     void unmarkMemoryElementBusy(QString address);
     void showRegValues();
+    void showResStations();
     void showMemory();
     void resetStationsAndRegisters();
 
@@ -38,6 +39,8 @@ private slots:
     void on_startButton_clicked();
 
     void on_resetButton_clicked();
+
+    void on_skipButton_clicked();
 
 private:
     Ui::MainWindow *ui;

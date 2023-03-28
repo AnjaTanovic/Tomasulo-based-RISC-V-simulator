@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1317</width>
-    <height>825</height>
+    <height>784</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -676,9 +676,9 @@
    <widget class="QTextEdit" name="memTextEdit">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>680</y>
-      <width>191</width>
+      <x>330</x>
+      <y>620</y>
+      <width>121</width>
       <height>91</height>
      </rect>
     </property>
@@ -706,6 +706,40 @@
     </property>
     <property name="wordWrap">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="clkLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>700</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="skipButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>212</x>
+      <y>620</y>
+      <width>111</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Skip 10 clocks</string>
     </property>
    </widget>
    <zorder>picture_label</zorder>
@@ -752,6 +786,8 @@
    <zorder>storeReg_4</zorder>
    <zorder>memTextEdit</zorder>
    <zorder>memoryTable</zorder>
+   <zorder>clkLabel</zorder>
+   <zorder>skipButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

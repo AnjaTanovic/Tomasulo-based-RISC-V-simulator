@@ -84,7 +84,7 @@ bool ReservationStationAddSub::getWorking()
 int ReservationStationAddSub::calculate()
 {
     int result;
-    if (op.toLower() == "add")
+    if (op == "add" || op == "addi")
         result = vj.toInt() + vk.toInt();
     else
         result = vj.toInt() - vk.toInt();
