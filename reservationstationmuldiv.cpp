@@ -9,7 +9,6 @@ ReservationStationMulDiv::ReservationStationMulDiv()
     this->vk = "";
     this->qj = "";
     this->qk = "";
-    this->resReg = "";
     this->atCycle = 0;
     this->working = false;
 }
@@ -42,11 +41,6 @@ void ReservationStationMulDiv::setQj(QString qj)
 void ReservationStationMulDiv::setQk(QString qk)
 {
     this->qk = qk;
-}
-
-void ReservationStationMulDiv::setResReg(QString resReg)
-{
-    this->resReg = resReg;
 }
 
 void ReservationStationMulDiv::setAtCycle(int cycle)
@@ -89,11 +83,6 @@ QString ReservationStationMulDiv::getQk()
     return qk;
 }
 
-QString ReservationStationMulDiv::getResReg()
-{
-    return resReg;
-}
-
 int ReservationStationMulDiv::getAtCycle()
 {
     return atCycle;
@@ -126,7 +115,6 @@ int ReservationStationMulDiv::calculate()
     vk = "";
     qj = "";
     qk = "";
-    resReg = "";
     atCycle = 0;
     working = false;
 

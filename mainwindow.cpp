@@ -759,252 +759,192 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 
 void MainWindow::checkReservationStations()
 {
-    //For all busy and working reservation stations check if they have finished their work
-    //For all busy reservation stations which are waiting for operands check if they are ready now
+    //For all busy and working reservation stations -> check if they have finished their work
+    //For all busy reservation stations which are waiting for operands -> check if they are computed in this cycle
 
     /********************************************************
     Analyze war waw rar and raw hazards
     ********************************************************/
 
-    bool regBusy;
-    QList<QString> registersToFree;
+    QList<QPair<int, QString>> cdb; //common data bus, (result, station name)
+
+    //Step 1: Check if working stations finished and send results on CDB
 
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
     {
-        if (stationsAddSub[i].getBusy())
+        if (stationsAddSub[i].getBusy() &&stationsAddSub[i].getWorking())
         {
-            if (stationsAddSub[i].getWorking())
+            if (stationsAddSub[i].getOp() == "add" || stationsAddSub[i].getOp() == "addi")
             {
-                if (stationsAddSub[i].getOp() == "add" || stationsAddSub[i].getOp() == "addi")
+                if (stationsAddSub[i].getAtCycle() == ADD_CLK_LATENCY)
                 {
-                    if (stationsAddSub[i].getAtCycle() == ADD_CLK_LATENCY)
-                    {
-                        registersToFree.append(stationsAddSub[i].getResReg());
-
-                        int regNumber = 0;
-                        QRegularExpression regularRegister("^[xX]([0-3])$");
-                        if (regularRegister.match(stationsAddSub[i].getResReg()).hasMatch())
-                        {
-                            regNumber = (regularRegister.match(stationsAddSub[i].getResReg()).captured(1)).toInt();
-                        }
-                        else
-                            qDebug() << "Problem with registers in instructions.";
-
-                        int result = stationsAddSub[i].calculate();
-                        registers[regNumber].setValue(result);
-                    }
-
+                    int result = stationsAddSub[i].calculate();
+                    cdb.append(QPair<int, QString>(result, ADDSUB_STATIONS_NAME + QString::number(i)));
                 }
-                else
-                {
-                    if (stationsAddSub[i].getAtCycle() == SUB_CLK_LATENCY)
-                    {
-                        registersToFree.append(stationsAddSub[i].getResReg());
 
-                        int regNumber = 0;
-                        QRegularExpression regularRegister("^[xX]([0-3])$");
-                        if (regularRegister.match(stationsAddSub[i].getResReg()).hasMatch())
-                        {
-                            regNumber = (regularRegister.match(stationsAddSub[i].getResReg()).captured(1)).toInt();
-                        }
-                        else
-                            qDebug() << "Problem with registers in instructions.";
-
-                        int result = stationsAddSub[i].calculate();
-                        registers[regNumber].setValue(result);
-                    }
-                }
             }
             else
             {
-                int allReady = 0;
-                bool numOk;
-
-                //check Vj
-                stationsAddSub[i].getVj().toInt(&numOk);
-                if (!numOk)
+                if (stationsAddSub[i].getAtCycle() == SUB_CLK_LATENCY)
                 {
-                    int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsAddSub[i].getVj()).hasMatch())
-                    {
-                        regNumberJ = (regularRegister.match(stationsAddSub[i].getVj()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumberJ].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsAddSub[i].setVj(QString::number(registers[regNumberJ].getValue()));
-                        allReady++;
-                    }
+                    int result = stationsAddSub[i].calculate();
+                    cdb.append(QPair<int, QString>(result, ADDSUB_STATIONS_NAME + QString::number(i)));
                 }
-                else
-                    allReady++;
-
-                //check Vk
-                stationsAddSub[i].getVk().toInt(&numOk);
-                if (!numOk)
-                {
-                    int regNumberK = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsAddSub[i].getVk()).hasMatch())
-                    {
-                        regNumberK = (regularRegister.match(stationsAddSub[i].getVk()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions. value of vk = " + stationsAddSub[i].getVk();
-
-                    regBusy = registers[regNumberK].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsAddSub[i].setVk(QString::number(registers[regNumberK].getValue()));
-                        allReady++;
-                    }
-                }
-                else
-                    allReady++;
-
-                if (allReady == 2)
-                    stationsAddSub[i].setWorking(true);
             }
-
         }
     }
 
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
-        if (stationsMulDiv[i].getBusy())
+        if (stationsMulDiv[i].getBusy() && stationsMulDiv[i].getWorking())
         {
-            if (stationsMulDiv[i].getWorking())
+            if (stationsMulDiv[i].getOp() == "mul")
             {
-                if (stationsMulDiv[i].getOp() == "mul")
+                if (stationsMulDiv[i].getAtCycle() == MUL_CLK_LATENCY)
                 {
-                    if (stationsMulDiv[i].getAtCycle() == MUL_CLK_LATENCY)
-                    {
-                        registersToFree.append(stationsMulDiv[i].getResReg());
-
-                        int regNumber = 0;
-                        QRegularExpression regularRegister("^[xX]([0-3])$");
-                        if (regularRegister.match(stationsMulDiv[i].getResReg()).hasMatch())
-                        {
-                            regNumber = (regularRegister.match(stationsMulDiv[i].getResReg()).captured(1)).toInt();
-                        }
-                        else
-                            qDebug() << "Problem with registers in instructions.";
-
-                        int result = stationsMulDiv[i].calculate();
-                        registers[regNumber].setValue(result);
-                    }
-
+                    int result = stationsMulDiv[i].calculate();
+                    cdb.append(QPair<int, QString>(result, MULDIV_STATIONS_NAME + QString::number(i)));
                 }
-                else
-                {
-                    if (stationsMulDiv[i].getAtCycle() == DIV_CLK_LATENCY)
-                    {
-                        registersToFree.append(stationsMulDiv[i].getResReg());
 
-                        int regNumber = 0;
-                        QRegularExpression regularRegister("^[xX]([0-3])$");
-                        if (regularRegister.match(stationsMulDiv[i].getResReg()).hasMatch())
-                        {
-                            regNumber = (regularRegister.match(stationsMulDiv[i].getResReg()).captured(1)).toInt();
-                        }
-                        else
-                            qDebug() << "Problem with registers in instructions.";
-
-                        int result = stationsMulDiv[i].calculate();
-                        registers[regNumber].setValue(result);
-                    }
-                }
             }
             else
             {
-                int allReady = 0;
-                bool numOk;
-
-                //check Vj
-                stationsMulDiv[i].getVj().toInt(&numOk);
-                if (!numOk)
+                if (stationsMulDiv[i].getAtCycle() == DIV_CLK_LATENCY)
                 {
-                    int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsMulDiv[i].getVj()).hasMatch())
-                    {
-                        regNumberJ = (regularRegister.match(stationsMulDiv[i].getVj()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumberJ].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsMulDiv[i].setVj(QString::number(registers[regNumberJ].getValue()));
-                        allReady++;
-                    }
+                    int result = stationsMulDiv[i].calculate();
+                    cdb.append(QPair<int, QString>(result, MULDIV_STATIONS_NAME + QString::number(i)));
                 }
-                else
-                    allReady++;
-
-                //check Vk
-                stationsMulDiv[i].getVk().toInt(&numOk);
-                if (!numOk)
-                {
-                    int regNumberK = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsMulDiv[i].getVk()).hasMatch())
-                    {
-                        regNumberK = (regularRegister.match(stationsMulDiv[i].getVk()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumberK].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsMulDiv[i].setVk(QString::number(registers[regNumberK].getValue()));
-                        allReady++;
-                    }
-                }
-                else
-                    allReady++;
-
-                if (allReady == 2)
-                    stationsMulDiv[i].setWorking(true);
             }
+        }
+    }
+
+    /********************************************************
+    Solve memoryBusy problem. If somebody is writing, mem is busy
+    load and store instructions in stations/buffers can finish
+    out of order (in buffer are only instructions with different
+    addresses)
+    example: one load and one store is allowed in one clk
+    counter counts that. This is just about resources, not algorithm
+    *********************************************************/
+
+    for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
+    {
+        if (stationsLoad[i].getBusy() && stationsLoad[i].getWorking())
+        {
+            if (stationsLoad[i].getAtCycle() >= LOAD_CLK_LATENCY)
+            {
+                //Check if memory element is busy
+                if (!memoryBusy[stationsLoad[i].getAddr()])
+                {
+                    int result = memory[stationsLoad[i].getAddr()];
+                    stationsLoad[i].read();
+                    cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
+    {
+        if (stationsStore[i].getBusy() && stationsStore[i].getWorking())
+        {
+            if (stationsStore[i].getAtCycle() == LOAD_CLK_LATENCY)
+            {
+                unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
+                memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
+                stationsStore[i].write();
+                //store does not send anything on cdb
+            }
+        }
+    }
+
+    //Step 2: Registers and reservation stations which are waiting, takes what is for them
+
+    for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
+    {
+        if (stationsAddSub[i].getBusy() && !stationsAddSub[i].getWorking())
+        {
+            for (int j = 0; j < cdb.size(); j++)
+            {
+                if (stationsAddSub[i].getQj() == cdb[j].second)
+                {
+                    stationsAddSub[i].setVj(QString::number(cdb[j].first));
+                    stationsAddSub[i].setQj("");
+                }
+                if (stationsAddSub[i].getQk() == cdb[j].second)
+                {
+                    stationsAddSub[i].setVk(QString::number(cdb[j].first));
+                    stationsAddSub[i].setQk("");
+                }
+            }
+            //completed reservation station
+            if (stationsAddSub[i].getQj() == "" && stationsAddSub[i].getQk() == "")
+                stationsAddSub[i].setWorking(true);
+        }
+    }
+
+    for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
+    {
+        if (stationsMulDiv[i].getBusy() && !stationsMulDiv[i].getWorking())
+        {
+            for (int j = 0; j < cdb.size(); j++)
+            {
+                if (stationsMulDiv[i].getQj() == cdb[j].second)
+                {
+                    stationsMulDiv[i].setVj(QString::number(cdb[j].first));
+                    stationsMulDiv[i].setQj("");
+                }
+                if (stationsMulDiv[i].getQk() == cdb[j].second)
+                {
+                    stationsMulDiv[i].setVk(QString::number(cdb[j].first));
+                    stationsMulDiv[i].setQk("");
+                }
+            }
+            //completed reservation station
+            if (stationsMulDiv[i].getQj() == "" && stationsMulDiv[i].getQk() == "")
+                stationsMulDiv[i].setWorking(true);
         }
     }
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
-        if (stationsLoad[i].getBusy())
+        if (stationsLoad[i].getBusy() && !stationsMulDiv[i].getWorking())
         {
-            if (stationsLoad[i].getWorking())
+            for (int j = 0; j < cdb.size(); j++)
             {
-                if (stationsLoad[i].getAtCycle() >= LOAD_CLK_LATENCY)
-                {
-                    //Check if memory element is busy
-                    if (!memoryBusy[stationsLoad[i].getAddr()])
-                    {
-                        registersToFree.append(stationsLoad[i].getResReg());
 
-                        int regNumber = 0;
-                        QRegularExpression regularRegister("^[xX]([0-3])$");
-                        if (regularRegister.match(stationsLoad[i].getResReg()).hasMatch())
-                        {
-                            regNumber = (regularRegister.match(stationsLoad[i].getResReg()).captured(1)).toInt();
-                        }
-                        else
-                            qDebug() << "Problem with registers in instructions.";
-
-                        int result = memory[stationsLoad[i].getAddr()];
-                        stationsLoad[i].read();
-
-                        registers[regNumber].setValue(result);
-                    }
-                }
             }
+            //completed reservation station
+
+        }
+    }
+
+    for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
+    {
+        if (stationsStore[i].getBusy() && !stationsStore[i].getWorking())
+        {
+            for (int j = 0; j < cdb.size(); j++)
+            {
+
+            }
+            //completed reservation station
+
+        }
+    }
+
+    for (int i = 0; i < NUM_OF_REGISTERS; i++)
+    {
+        for (int j = 0; j < cdb.size(); j++)
+        {
+            if (registers[i].getQ() == cdb[j].second)
+            {
+                registers[i].setValue(cdb[j].first);
+                registers[i].setQ("");
+            }
+        }
+    }
+
+/*
             else
             {
                 bool numOk;
@@ -1034,20 +974,6 @@ void MainWindow::checkReservationStations()
             }
         }
     }
-
-    for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
-    {
-        if (stationsStore[i].getBusy())
-        {
-            if (stationsStore[i].getWorking())
-            {
-                if (stationsStore[i].getAtCycle() == LOAD_CLK_LATENCY)
-                {
-                    unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                    memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
-                    stationsStore[i].write();
-                }
-            }
             else
             {
                 int allReady = 0;
@@ -1106,21 +1032,7 @@ void MainWindow::checkReservationStations()
             }
         }
     }
-
-    //Free registers in the end of all loops, so no one can take them in this cycle
-    for (int i = 0; i < registersToFree.size(); i++)
-    {
-        int regNumber = 0;
-        QRegularExpression regularRegister("^[xX]([0-3])$");
-        if (regularRegister.match(registersToFree[i]).hasMatch())
-        {
-            regNumber = (regularRegister.match(registersToFree[i]).captured(1)).toInt();
-        }
-        else
-            qDebug() << "Problem with registers in instructions.";
-
-        registers[regNumber].setQ("");
-    }
+*/
 }
 
 void MainWindow::markRegisterBusy(QString reg, QString stationName, QString stationNumber)

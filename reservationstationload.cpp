@@ -6,7 +6,6 @@ ReservationStationLoad::ReservationStationLoad()
     this->addrReg = "";
     this->q = "";
     this->imm = "";
-    this->resReg = "";
     this->addr = 0;
     this->atCycle = 0;
     this->working = false;
@@ -30,11 +29,6 @@ void ReservationStationLoad::setQ(QString q)
 void ReservationStationLoad::setImm(QString imm)
 {
     this->imm = imm;
-}
-
-void ReservationStationLoad::setResReg(QString resReg)
-{
-    this->resReg = resReg;
 }
 
 void ReservationStationLoad::setAddr(int addr)
@@ -72,11 +66,6 @@ QString ReservationStationLoad::getImm()
     return imm;
 }
 
-QString ReservationStationLoad::getResReg()
-{
-    return resReg;
-}
-
 int ReservationStationLoad::getAddr()
 {
     return addr;
@@ -97,7 +86,6 @@ void ReservationStationLoad::read()
     busy = false;
     addrReg = "";
     imm = "";
-    resReg = "";
     addr = 0;
     atCycle = 0;
     working = false;

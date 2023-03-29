@@ -12,7 +12,6 @@ public:
     void setVk(QString vk);
     void setQj(QString qj);
     void setQk(QString qk);
-    void setResReg(QString resReg);
     void setAtCycle(int cycle);
     void setWorking(bool working);
     bool getBusy();
@@ -21,7 +20,6 @@ public:
     QString getVk();
     QString getQj();
     QString getQk();
-    QString getResReg();
     int getAtCycle();
     bool getWorking();
     int calculate();
@@ -32,7 +30,6 @@ private:
     QString vk;
     QString qj;
     QString qk;
-    QString resReg;
     int atCycle;
     bool working;
 };

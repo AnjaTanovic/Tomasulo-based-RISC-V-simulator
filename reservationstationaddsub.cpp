@@ -8,7 +8,6 @@ ReservationStationAddSub::ReservationStationAddSub()
     this->vk = "";
     this->qj = "";
     this->qk = "";
-    this->resReg = "";
     this->atCycle = 0;
     this->working = false;
 }
@@ -41,11 +40,6 @@ void ReservationStationAddSub::setQj(QString qj)
 void ReservationStationAddSub::setQk(QString qk)
 {
     this->qk = qk;
-}
-
-void ReservationStationAddSub::setResReg(QString resReg)
-{
-    this->resReg = resReg;
 }
 
 void ReservationStationAddSub::setAtCycle(int cycle)
@@ -88,11 +82,6 @@ QString ReservationStationAddSub::getQk()
     return qk;
 }
 
-QString ReservationStationAddSub::getResReg()
-{
-    return resReg;
-}
-
 int ReservationStationAddSub::getAtCycle()
 {
     return atCycle;
@@ -117,7 +106,6 @@ int ReservationStationAddSub::calculate()
     vk = "";
     qj = "";
     qk = "";
-    resReg = "";
     atCycle = 0;
     working = false;
 

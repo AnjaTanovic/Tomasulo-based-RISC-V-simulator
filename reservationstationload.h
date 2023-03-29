@@ -10,7 +10,6 @@ public:
     void setAddrReg(QString addrReg);
     void setQ(QString q);
     void setImm(QString imm);
-    void setResReg(QString resReg);
     void setAddr(int addr);
     void setAtCycle(int cycle);
     void setWorking(bool working);
@@ -18,7 +17,6 @@ public:
     QString getAddrReg();
     QString getQ();
     QString getImm();
-    QString getResReg();
     int getAddr();
     int getAtCycle();
     bool getWorking();
@@ -29,7 +27,6 @@ private:
     QString q;
     QString imm;
     int addr;
-    QString resReg;
     int atCycle;
     bool working;
 };
