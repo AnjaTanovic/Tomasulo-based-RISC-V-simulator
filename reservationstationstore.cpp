@@ -4,9 +4,11 @@ ReservationStationStore::ReservationStationStore()
 {
     this->busy = false;
     this->addrReg = "";
+    this->q = "";
     this->imm = "";
     this->addr = 0;
     this->vj = "";
+    this->qj = "";
     this->atCycle = 0;
     this->working = false;
 }
@@ -19,6 +21,11 @@ void ReservationStationStore::setBusy(bool busy)
 void ReservationStationStore::setAddrReg(QString addrReg)
 {
     this->addrReg = addrReg;
+}
+
+void ReservationStationStore::setQ(QString q)
+{
+    this->q = q;
 }
 
 void ReservationStationStore::setImm(QString imm)
@@ -34,6 +41,11 @@ void ReservationStationStore::setAddr(int addr)
 void ReservationStationStore::setVj(QString vj)
 {
     this->vj = vj;
+}
+
+void ReservationStationStore::setQj(QString qj)
+{
+    this->qj = qj;
 }
 
 void ReservationStationStore::setAtCycle(int cycle)
@@ -56,6 +68,11 @@ QString ReservationStationStore::getAddrReg()
     return addrReg;
 }
 
+QString ReservationStationStore::getQ()
+{
+    return q;
+}
+
 QString ReservationStationStore::getImm()
 {
     return imm;
@@ -69,6 +86,11 @@ int ReservationStationStore::getAddr()
 QString ReservationStationStore::getVj()
 {
     return vj;
+}
+
+QString ReservationStationStore::getQj()
+{
+    return qj;
 }
 
 int ReservationStationStore::getAtCycle()
@@ -85,9 +107,11 @@ void ReservationStationStore::write()
 {
     busy = false;
     addrReg = "";
+    q = "";
     imm = "";
     addr = 0;
     vj = "";
+    qj = "";
     atCycle = 0;
     working = false;
 }

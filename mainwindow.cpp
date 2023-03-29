@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "instruction.h"
 #include "reservationstationaddsub.h"
+#include "cpufeatures.h"
 #include "reservationstationload.h"
 #include "reservationstationmuldiv.h"
 #include "reservationstationstore.h"
@@ -9,24 +10,6 @@
 #include <QDebug>
 #include <QPainter>
 #include <QRegularExpression>
-
-#define NUM_OF_ADDSUB_STATIONS 3
-#define NUM_OF_LOAD_STATIONS 5
-#define NUM_OF_STORE_STATIONS 5
-#define NUM_OF_MULDIV_STATIONS 2
-
-#define NUM_OF_REGISTERS 4
-
-#define MEMORY_SIZE 1000
-
-#define QUEUE_SIZE 6
-
-#define ADD_CLK_LATENCY 2
-#define SUB_CLK_LATENCY 2
-#define LOAD_CLK_LATENCY 2
-#define STORE_CLK_LATENCY 2
-#define MUL_CLK_LATENCY 10
-#define DIV_CLK_LATENCY 40
 
 int clkCycle = 0;
 QStringList instructionsString;
@@ -49,9 +32,7 @@ compile is not real compiling, change word
 ********************************************************/
 
 /********************************************************
-Choose whether instructions use integer or floating point
-values (names of registers and instructions are different)
-Draw a diagram according to the decision.
+Draw a diagram or use tables for showing stations
 ********************************************************/
 
 /********************************************************
@@ -148,10 +129,10 @@ void MainWindow::compileProgram()
     //Checking format
     for (int i = 0; i < instructionsString.size(); i++)
     {
-        QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([fF][0-3])\\s*,\\s*([fF][0-3])\\s*,\\s*([fF][0-3])\\s*$");
-        QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([fF][0-3])\\s*,\\s*([0-9]+)\\s*,\\s*([fF][0-3])\\s*$");
-        QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([fF][0-3])\\s*,\\s*([0-9]+)[(]\\s*([fF][0-3])\\s*[)]\\s*$");
-        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([fF][0-3])\\s*,\\s*([fF][0-3])\\s*,\\s*([0-9]+)\\s*$");
+        QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-3])\\s*,\\s*([xX][0-3])\\s*,\\s*([xX][0-3])\\s*$");
+        QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-3])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-3])\\s*$");
+        QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-3])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-3])\\s*[)]\\s*$");
+        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-3])\\s*,\\s*([xX][0-3])\\s*,\\s*([0-9]+)\\s*$");
 
         if (regularInstruction1.match(instructionsString[i]).hasMatch())
         {
@@ -284,6 +265,10 @@ void MainWindow::on_clkButton_clicked()
             nextInstruction++;
             shiftQueue();
         }
+		else
+		{
+			qDebug() << "All reservation stations for next instruction in queue are busy -> stall.";
+		}
     }
     else
     {
@@ -476,7 +461,7 @@ void MainWindow::cleanFields()
 
     for (int i = 0; i < NUM_OF_REGISTERS; i++)
     {
-        labelName = "f_" + QString::number(i);
+        labelName = "x_" + QString::number(i);
         targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText(QString::number(registers[i].getValue()));
     }
@@ -488,7 +473,6 @@ void MainWindow::cleanFields()
 bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    bool regBusy;
     int allReady = 0;
 
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
@@ -505,40 +489,45 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
             int regNumberJ = 0;
             int regNumberK = 0; //string vj can be register or immediate
             bool vkIsImm = false;
-            QRegularExpression regularRegister("^[fF]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-3])$");
+
+            //Vj
             if (regularRegister.match(vj).hasMatch())
             {
                 regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
-                regBusy = registers[regNumberJ].getBusy();
-                if (regBusy)
-                {
-                    //write only reg name (f1, f2 ...)
-                    stationsAddSub[i].setVj(vj);
-                }
-                else
+                if (registers[regNumberJ].getQ() == "")
                 {
                     //write value
                     stationsAddSub[i].setVj(QString::number(registers[regNumberJ].getValue()));
+                    //stationsAddSub[i].setQj("");
                     allReady++;
+                }
+                else
+                {
+                    //write only reg name (f1, f2 ...)
+                    stationsAddSub[i].setVj(vj);
+                    stationsAddSub[i].setQj(registers[regNumberJ].getQ());
                 }
             }
             else
                 qDebug() << "Problem with registers in instructions.";
 
+            //Vk
             if (regularRegister.match(vk).hasMatch())
             {
                 regNumberK = (regularRegister.match(vk).captured(1)).toInt();
-                regBusy = registers[regNumberK].getBusy();
-                if (regBusy)
-                {
-                    //write only reg name (f1, f2 ...)
-                    stationsAddSub[i].setVk(vk);
-                }
-                else
+                if (registers[regNumberK].getQ() == "")
                 {
                     //write value
                     stationsAddSub[i].setVk(QString::number(registers[regNumberK].getValue()));
+                    //stationsAddSub[i].setQk("");
                     allReady++;
+                }
+                else
+                {
+                    //write only reg name (f1, f2 ...)
+                    stationsAddSub[i].setVk(vk);
+                    stationsAddSub[i].setQk(registers[regNumberK].getQ());
                 }
             }
             else
@@ -559,7 +548,7 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
 
             notBusy = true;
 
-            markRegisterBusy(resReg);
+            markRegisterBusy(resReg, ADDSUB_STATIONS_NAME, QString::number(i));
 
             break;
         }
@@ -571,7 +560,6 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
 bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    bool regBusy;
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
@@ -587,32 +575,38 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
             //ADDRESS REGISTER
 
             int regNumber = 0;
-            QRegularExpression regularRegister("^[fF]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-3])$");
             if (regularRegister.match(addrReg).hasMatch())
             {
                 regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
+                if (registers[regNumber].getQ() == "")
+                {
+                    //calculate address and write value
+                    stationsLoad[i].setAddrReg(QString::number(registers[regNumber].getValue()));
+                    stationsLoad[i].setAddr(imm.toInt() + registers[regNumber].getValue());
+
+                    /**************************************************
+                    first check if there is store with the same address in buffers
+
+                    stationsLoad[i].setWorking(true); notBusy
+                    if busy, reset stationsLoad[i]
+                    and dont mark register
+                    **************************************************/
+                }
+                else
+                {
+                    //write reg name
+                    stationsLoad[i].setAddrReg(addrReg);
+                    stationsLoad[i].setQ(registers[regNumber].getQ());
+                    stationsLoad[i].setAddr(-1);
+                }
             }
             else
                 qDebug() << "Problem with registers in instructions.";
 
-            regBusy = registers[regNumber].getBusy();
-            if (regBusy)
-            {
-                //write reg name
-                stationsLoad[i].setAddrReg(addrReg);
-                stationsLoad[i].setAddr(-1);
-            }
-            else
-            {
-                //calculate address and write value
-                stationsLoad[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                stationsLoad[i].setAddr(imm.toInt() + registers[regNumber].getValue());
-                stationsLoad[i].setWorking(true);
-            }
-
             notBusy = true;
 
-            markRegisterBusy(resReg);
+            markRegisterBusy(resReg, LOAD_STATIONS_NAME, QString::number(i));
 
             break;
         }
@@ -623,7 +617,6 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
 bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    bool regBusy;
     int allReady = 0;
 
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
@@ -638,43 +631,43 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
 
             int regNumber = 0;
             int regNumberJ = 0;
-            QRegularExpression regularRegister("^[fF]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-3])$");
             if (regularRegister.match(addrReg).hasMatch() && regularRegister.match(vj).hasMatch())
             {
                 regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
                 regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
+                if (registers[regNumber].getQ() == "")
+                {
+                    //calculate address and write value
+                    stationsStore[i].setAddrReg(QString::number(registers[regNumber].getValue()));
+                    stationsStore[i].setAddr(imm.toInt() + registers[regNumber].getValue());
+                    markMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
+                    allReady++;
+                }
+                else
+                {
+                    //write reg name
+                    stationsStore[i].setAddrReg(addrReg);
+                    stationsStore[i].setQ(registers[regNumber].getQ());
+                    stationsStore[i].setAddr(-1);
+                }
+
+                if (registers[regNumberJ].getQ() == "")
+                {
+                    //write value
+                    stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
+                    //stationsStore[i].setQj("");
+                    allReady++;
+                }
+                else
+                {
+                    //write only reg name (f1, f2 ...)
+                    stationsStore[i].setVj(vj);
+                    stationsStore[i].setQj(registers[regNumberJ].getQ());
+                }
             }
             else
                 qDebug() << "Problem with registers in instructions.";
-
-            regBusy = registers[regNumber].getBusy();
-            if (regBusy)
-            {
-                //write reg name
-                stationsStore[i].setAddrReg(addrReg);
-                stationsStore[i].setAddr(-1);
-                markMemoryElementBusy(imm + "(" + addrReg + ")");
-            }
-            else
-            {
-                //calculate address and write value
-                stationsStore[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                stationsStore[i].setAddr(imm.toInt() + registers[regNumber].getValue());
-                markMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                allReady++;
-            }
-            regBusy = registers[regNumberJ].getBusy();
-            if (regBusy)
-            {
-                //write only reg name (f1, f2 ...)
-                stationsStore[i].setVj(vj);
-            }
-            else
-            {
-                //write value
-                stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
-                allReady++;
-            }
 
             if (allReady == 2)
                 stationsStore[i].setWorking(true);
@@ -691,7 +684,6 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
 bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString vj, QString vk)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    bool regBusy;
     int allReady = 0;
 
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
@@ -707,40 +699,45 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 
             int regNumberJ = 0;
             int regNumberK = 0;
-            QRegularExpression regularRegister("^[fF]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-3])$");
+
+            //Vj
             if (regularRegister.match(vj).hasMatch())
             {
                 regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
-                regBusy = registers[regNumberJ].getBusy();
-                if (regBusy)
-                {
-                    //write only reg name (f1, f2 ...)
-                    stationsMulDiv[i].setVj(vj);
-                }
-                else
+                if (registers[regNumberJ].getQ() == "")
                 {
                     //write value
                     stationsMulDiv[i].setVj(QString::number(registers[regNumberJ].getValue()));
+                    //stationsMulDiv[i].setQj("");
                     allReady++;
+                }
+                else
+                {
+                    //write only reg name (f1, f2 ...)
+                    stationsMulDiv[i].setVj(vj);
+                    stationsMulDiv[i].setQj(registers[regNumberJ].getQ());
                 }
             }
             else
                 qDebug() << "Problem with registers in instructions.";
 
+            //Vk
             if (regularRegister.match(vk).hasMatch())
             {
                 regNumberK = (regularRegister.match(vk).captured(1)).toInt();
-                regBusy = registers[regNumberK].getBusy();
-                if (regBusy)
-                {
-                    //write only reg name (f1, f2 ...)
-                    stationsMulDiv[i].setVk(vk);
-                }
-                else
+                if (registers[regNumberK].getQ() == "")
                 {
                     //write value
                     stationsMulDiv[i].setVk(QString::number(registers[regNumberK].getValue()));
+                    //stationsMulDiv[i].setQk("");
                     allReady++;
+                }
+                else
+                {
+                    //write only reg name (f1, f2 ...)
+                    stationsMulDiv[i].setVk(vk);
+                    stationsMulDiv[i].setQk(registers[regNumberK].getQ());
                 }
             }
             else
@@ -751,7 +748,7 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 
             notBusy = true;
 
-            markRegisterBusy(resReg);
+            markRegisterBusy(resReg, MULDIV_STATIONS_NAME, QString::number(i));
 
             break;
         }
@@ -764,10 +761,6 @@ void MainWindow::checkReservationStations()
 {
     //For all busy and working reservation stations check if they have finished their work
     //For all busy reservation stations which are waiting for operands check if they are ready now
-
-    /********************************************************
-    Solve problem with instructions with patterns: op fi,fi,x or op fi,x,fi
-    ********************************************************/
 
     /********************************************************
     Analyze war waw rar and raw hazards
@@ -789,7 +782,7 @@ void MainWindow::checkReservationStations()
                         registersToFree.append(stationsAddSub[i].getResReg());
 
                         int regNumber = 0;
-                        QRegularExpression regularRegister("^[fF]([0-3])$");
+                        QRegularExpression regularRegister("^[xX]([0-3])$");
                         if (regularRegister.match(stationsAddSub[i].getResReg()).hasMatch())
                         {
                             regNumber = (regularRegister.match(stationsAddSub[i].getResReg()).captured(1)).toInt();
@@ -809,7 +802,7 @@ void MainWindow::checkReservationStations()
                         registersToFree.append(stationsAddSub[i].getResReg());
 
                         int regNumber = 0;
-                        QRegularExpression regularRegister("^[fF]([0-3])$");
+                        QRegularExpression regularRegister("^[xX]([0-3])$");
                         if (regularRegister.match(stationsAddSub[i].getResReg()).hasMatch())
                         {
                             regNumber = (regularRegister.match(stationsAddSub[i].getResReg()).captured(1)).toInt();
@@ -832,7 +825,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsAddSub[i].getVj()).hasMatch())
                     {
                         regNumberJ = (regularRegister.match(stationsAddSub[i].getVj()).captured(1)).toInt();
@@ -855,7 +848,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumberK = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsAddSub[i].getVk()).hasMatch())
                     {
                         regNumberK = (regularRegister.match(stationsAddSub[i].getVk()).captured(1)).toInt();
@@ -893,7 +886,7 @@ void MainWindow::checkReservationStations()
                         registersToFree.append(stationsMulDiv[i].getResReg());
 
                         int regNumber = 0;
-                        QRegularExpression regularRegister("^[fF]([0-3])$");
+                        QRegularExpression regularRegister("^[xX]([0-3])$");
                         if (regularRegister.match(stationsMulDiv[i].getResReg()).hasMatch())
                         {
                             regNumber = (regularRegister.match(stationsMulDiv[i].getResReg()).captured(1)).toInt();
@@ -913,7 +906,7 @@ void MainWindow::checkReservationStations()
                         registersToFree.append(stationsMulDiv[i].getResReg());
 
                         int regNumber = 0;
-                        QRegularExpression regularRegister("^[fF]([0-3])$");
+                        QRegularExpression regularRegister("^[xX]([0-3])$");
                         if (regularRegister.match(stationsMulDiv[i].getResReg()).hasMatch())
                         {
                             regNumber = (regularRegister.match(stationsMulDiv[i].getResReg()).captured(1)).toInt();
@@ -936,7 +929,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsMulDiv[i].getVj()).hasMatch())
                     {
                         regNumberJ = (regularRegister.match(stationsMulDiv[i].getVj()).captured(1)).toInt();
@@ -959,7 +952,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumberK = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsMulDiv[i].getVk()).hasMatch())
                     {
                         regNumberK = (regularRegister.match(stationsMulDiv[i].getVk()).captured(1)).toInt();
@@ -997,7 +990,7 @@ void MainWindow::checkReservationStations()
                         registersToFree.append(stationsLoad[i].getResReg());
 
                         int regNumber = 0;
-                        QRegularExpression regularRegister("^[fF]([0-3])$");
+                        QRegularExpression regularRegister("^[xX]([0-3])$");
                         if (regularRegister.match(stationsLoad[i].getResReg()).hasMatch())
                         {
                             regNumber = (regularRegister.match(stationsLoad[i].getResReg()).captured(1)).toInt();
@@ -1021,7 +1014,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumber = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsLoad[i].getAddrReg()).hasMatch())
                     {
                         regNumber = (regularRegister.match(stationsLoad[i].getAddrReg()).captured(1)).toInt();
@@ -1065,7 +1058,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsStore[i].getVj()).hasMatch())
                     {
                         regNumberJ = (regularRegister.match(stationsStore[i].getVj()).captured(1)).toInt();
@@ -1088,7 +1081,7 @@ void MainWindow::checkReservationStations()
                 if (!numOk)
                 {
                     int regNumber = 0;
-                    QRegularExpression regularRegister("^[fF]([0-3])$");
+                    QRegularExpression regularRegister("^[xX]([0-3])$");
                     if (regularRegister.match(stationsStore[i].getAddrReg()).hasMatch())
                     {
                         regNumber = (regularRegister.match(stationsStore[i].getAddrReg()).captured(1)).toInt();
@@ -1118,7 +1111,7 @@ void MainWindow::checkReservationStations()
     for (int i = 0; i < registersToFree.size(); i++)
     {
         int regNumber = 0;
-        QRegularExpression regularRegister("^[fF]([0-3])$");
+        QRegularExpression regularRegister("^[xX]([0-3])$");
         if (regularRegister.match(registersToFree[i]).hasMatch())
         {
             regNumber = (regularRegister.match(registersToFree[i]).captured(1)).toInt();
@@ -1126,14 +1119,14 @@ void MainWindow::checkReservationStations()
         else
             qDebug() << "Problem with registers in instructions.";
 
-        registers[regNumber].setBusy(false);
+        registers[regNumber].setQ("");
     }
 }
 
-void MainWindow::markRegisterBusy(QString reg)
+void MainWindow::markRegisterBusy(QString reg, QString stationName, QString stationNumber)
 {
     int regNumber = 0;
-    QRegularExpression regularRegister("^[fF]([0-3])$");
+    QRegularExpression regularRegister("^[xX]([0-3])$");
     if (regularRegister.match(reg).hasMatch())
     {
         regNumber = (regularRegister.match(reg).captured(1)).toInt();
@@ -1141,7 +1134,7 @@ void MainWindow::markRegisterBusy(QString reg)
     else
         qDebug() << "Problem with registers in instructions.";
 
-    registers[regNumber].setBusy(true);
+    registers[regNumber].setQ(stationName + stationNumber);
 }
 
 void MainWindow::markMemoryElementBusy(QString address)
@@ -1178,7 +1171,7 @@ void MainWindow::showRegValues()
 
     for (int i = 0; i < NUM_OF_REGISTERS; i++)
     {
-        labelName = "f_" + QString::number(i);
+        labelName = "x_" + QString::number(i);
         targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText(QString::number(registers[i].getValue()));
     }
@@ -1337,7 +1330,7 @@ void MainWindow::resetStationsAndRegisters()
     //reset registers
     for (int i = 0; i < NUM_OF_REGISTERS; i++)
     {
-        registers[i].setBusy(false);
+        registers[i].setQ("");
         registers[i].setValue(0);
     }
 }

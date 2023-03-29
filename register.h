@@ -7,12 +7,12 @@ class Register
 public:
     Register();
     void setValue(int value);
-    void setBusy(bool busy);
+    void setQ(QString q);
     int getValue();
-    bool getBusy();
+    QString getQ();
 private:
     int value;
-    bool busy;
+    QString q;
 };
 
 #endif // REGISTER_H

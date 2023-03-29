@@ -7,6 +7,8 @@ ReservationStationMulDiv::ReservationStationMulDiv()
     this->op = "";
     this->vj = "";
     this->vk = "";
+    this->qj = "";
+    this->qk = "";
     this->resReg = "";
     this->atCycle = 0;
     this->working = false;
@@ -30,6 +32,16 @@ void ReservationStationMulDiv::setVj(QString vj)
 void ReservationStationMulDiv::setVk(QString vk)
 {
     this->vk = vk;
+}
+
+void ReservationStationMulDiv::setQj(QString qj)
+{
+    this->qj = qj;
+}
+
+void ReservationStationMulDiv::setQk(QString qk)
+{
+    this->qk = qk;
 }
 
 void ReservationStationMulDiv::setResReg(QString resReg)
@@ -67,6 +79,16 @@ QString ReservationStationMulDiv::getVk()
     return vk;
 }
 
+QString ReservationStationMulDiv::getQj()
+{
+    return qj;
+}
+
+QString ReservationStationMulDiv::getQk()
+{
+    return qk;
+}
+
 QString ReservationStationMulDiv::getResReg()
 {
     return resReg;
@@ -102,6 +124,8 @@ int ReservationStationMulDiv::calculate()
     op = "";
     vj = "";
     vk = "";
+    qj = "";
+    qk = "";
     resReg = "";
     atCycle = 0;
     working = false;

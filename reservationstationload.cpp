@@ -4,6 +4,7 @@ ReservationStationLoad::ReservationStationLoad()
 {
     this->busy = false;
     this->addrReg = "";
+    this->q = "";
     this->imm = "";
     this->resReg = "";
     this->addr = 0;
@@ -19,6 +20,11 @@ void ReservationStationLoad::setBusy(bool busy)
 void ReservationStationLoad::setAddrReg(QString addrReg)
 {
     this->addrReg = addrReg;
+}
+
+void ReservationStationLoad::setQ(QString q)
+{
+    this->q = q;
 }
 
 void ReservationStationLoad::setImm(QString imm)
@@ -54,6 +60,11 @@ bool ReservationStationLoad::getBusy()
 QString ReservationStationLoad::getAddrReg()
 {
     return addrReg;
+}
+
+QString ReservationStationLoad::getQ()
+{
+    return q;
 }
 
 QString ReservationStationLoad::getImm()

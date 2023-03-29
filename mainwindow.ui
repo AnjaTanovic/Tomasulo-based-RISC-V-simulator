@@ -19,7 +19,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>301</width>
+      <width>344</width>
       <height>581</height>
      </rect>
     </property>
@@ -322,7 +322,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="f_1">
+   <widget class="QLabel" name="x_1">
     <property name="geometry">
      <rect>
       <x>1090</x>
@@ -335,7 +335,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="f_2">
+   <widget class="QLabel" name="x_2">
     <property name="geometry">
      <rect>
       <x>1090</x>
@@ -348,7 +348,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="f_3">
+   <widget class="QLabel" name="x_3">
     <property name="geometry">
      <rect>
       <x>1090</x>
@@ -361,7 +361,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="f_0">
+   <widget class="QLabel" name="x_0">
     <property name="geometry">
      <rect>
       <x>1090</x>
@@ -757,10 +757,10 @@
    <zorder>queue_0</zorder>
    <zorder>storeAddr_0</zorder>
    <zorder>storeAddr_1</zorder>
-   <zorder>f_1</zorder>
-   <zorder>f_2</zorder>
-   <zorder>f_3</zorder>
-   <zorder>f_0</zorder>
+   <zorder>x_1</zorder>
+   <zorder>x_2</zorder>
+   <zorder>x_3</zorder>
+   <zorder>x_0</zorder>
    <zorder>addsOp_0</zorder>
    <zorder>addsOp_1</zorder>
    <zorder>addsOp_2</zorder>

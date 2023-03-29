@@ -8,6 +8,7 @@ public:
     ReservationStationLoad();
     void setBusy(bool busy);
     void setAddrReg(QString addrReg);
+    void setQ(QString q);
     void setImm(QString imm);
     void setResReg(QString resReg);
     void setAddr(int addr);
@@ -15,6 +16,7 @@ public:
     void setWorking(bool working);
     bool getBusy();
     QString getAddrReg();
+    QString getQ();
     QString getImm();
     QString getResReg();
     int getAddr();
@@ -24,9 +26,10 @@ public:
 private:
     bool busy;
     QString addrReg;
+    QString q;
     QString imm;
-    QString resReg;
     int addr;
+    QString resReg;
     int atCycle;
     bool working;
 };

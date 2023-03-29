@@ -3,7 +3,7 @@
 Register::Register()
 {
     this->value = 0;
-    this->busy = false;
+    this->q = "";
 }
 
 void Register::setValue(int value)
@@ -11,9 +11,9 @@ void Register::setValue(int value)
     this->value = value;
 }
 
-void Register::setBusy(bool busy)
+void Register::setQ(QString q)
 {
-    this->busy = busy;
+    this->q = q;
 }
 
 int Register::getValue()
@@ -21,7 +21,7 @@ int Register::getValue()
     return value;
 }
 
-bool Register::getBusy()
+QString Register::getQ()
 {
-    return busy;
+    return q;
 }

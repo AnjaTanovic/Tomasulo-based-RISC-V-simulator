@@ -19,6 +19,7 @@ SOURCES += \
     reservationstationstore.cpp
 
 HEADERS += \
+    cpufeatures.h \
     instruction.h \
     mainwindow.h \
     register.h \

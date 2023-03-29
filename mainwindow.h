@@ -23,7 +23,7 @@ public:
     bool fillReservationStationStores(QString vj, QString imm, QString addrReg);
     bool fillReservationStationMults(QString op, QString resReg, QString vj, QString vk);
     void checkReservationStations();
-    void markRegisterBusy(QString reg);
+    void markRegisterBusy(QString reg, QString stationName, QString stationNumber);
     void markMemoryElementBusy(QString address);
     void unmarkMemoryElementBusy(QString address);
     void showRegValues();

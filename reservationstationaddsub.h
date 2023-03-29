@@ -10,6 +10,8 @@ public:
     void setOp(QString op);
     void setVj(QString vj);
     void setVk(QString vk);
+    void setQj(QString qj);
+    void setQk(QString qk);
     void setResReg(QString resReg);
     void setAtCycle(int cycle);
     void setWorking(bool working);
@@ -17,6 +19,8 @@ public:
     QString getOp();
     QString getVj();
     QString getVk();
+    QString getQj();
+    QString getQk();
     QString getResReg();
     int getAtCycle();
     bool getWorking();
@@ -26,6 +30,8 @@ private:
     QString op;
     QString vj;
     QString vk;
+    QString qj;
+    QString qk;
     QString resReg;
     int atCycle;
     bool working;
