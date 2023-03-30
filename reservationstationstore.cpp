@@ -8,6 +8,7 @@ ReservationStationStore::ReservationStationStore()
     this->qj = "";
     this->atCycle = 0;
     this->working = false;
+    this->port = "";
 }
 
 void ReservationStationStore::setBusy(bool busy)
@@ -40,6 +41,11 @@ void ReservationStationStore::setWorking(bool working)
     this->working = working;
 }
 
+void ReservationStationStore::setPort(QString port)
+{
+    this->port = port;
+}
+
 bool ReservationStationStore::getBusy()
 {
     return busy;
@@ -70,6 +76,11 @@ bool ReservationStationStore::getWorking()
     return working;
 }
 
+QString ReservationStationStore::getPort()
+{
+    return port;
+}
+
 void ReservationStationStore::write()
 {
     busy = false;
@@ -78,4 +89,5 @@ void ReservationStationStore::write()
     qj = "";
     atCycle = 0;
     working = false;
+    port = "";
 }

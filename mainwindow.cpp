@@ -10,11 +10,11 @@
 #include <QDebug>
 #include <QPainter>
 #include <QRegularExpression>
+#include <QMessageBox>
 
 int clkCycle = 0;
 QStringList instructionsString;
 QString code;
-QString memText;
 int nextQueueInstruction = 0; //which instruction from code is next to be inserted in queue
 int nextInstruction = 0;
 int numberOfInstructions = 0;
@@ -25,7 +25,9 @@ QList<ReservationStationMulDiv> stationsMulDiv;
 QList<ReservationStationStore> stationsStore;
 QList<Register> registers;
 int memory[MEMORY_SIZE];
-bool memoryBusy[MEMORY_SIZE];
+bool memoryPortA;
+bool memoryPortB;
+bool divisionByZero = false;
 
 /********************************************************
 compile is not real compiling, change word
@@ -33,10 +35,6 @@ compile is not real compiling, change word
 
 /********************************************************
 Draw a diagram or use tables for showing stations
-********************************************************/
-
-/********************************************************
-Decide what app should do if divison by zero occurs
 ********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
@@ -89,14 +87,31 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
         memory[i] = 0;
-        memoryBusy[i] = false;
-        QTableWidgetItem *addr= new QTableWidgetItem(QString::number(i) + " :");
-        QTableWidgetItem *data= new QTableWidgetItem("0");
+        QTableWidgetItem *addr = new QTableWidgetItem(QString::number(i) + " :");
+        QTableWidgetItem *data = new QTableWidgetItem("0");
         ui->memoryTable->setItem(i, 0, addr);
         ui->memoryTable->setItem(i, 1, data);
     }
+    memoryPortA = false;
+    memoryPortB = false;
+    ui->portTable->setColumnCount(2);
+    ui->portTable->setRowCount(1);
+    ui->portTable->verticalHeader()->setVisible(false);
+    ui->portTable->horizontalHeader()->setVisible(false);
+    ui->portTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->portTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    QTableWidgetItem *portA = new QTableWidgetItem("Port A");
+    portA->setTextAlignment(Qt::AlignCenter);
+    ui->portTable->setItem(0, 0, portA);
+    QTableWidgetItem *portB = new QTableWidgetItem("Port B");
+    portB->setTextAlignment(Qt::AlignCenter);
+    ui->portTable->setItem(0, 1, portB);
 
-    cleanFields();
+    cleanQueue();
+    showRegValues();
+    showResStations();
+    showMemory();
+    ui->clkLabel->setText("");
 }
 
 MainWindow::~MainWindow()
@@ -115,6 +130,9 @@ void MainWindow::compileProgram()
     code = ui->codeTextEdit->toPlainText();
     nextInstruction = 0;
     instructions.clear();
+    resetProcessor();
+    divisionByZero = false;
+
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(false);
     ui->skipButton->setEnabled(false);
@@ -272,9 +290,7 @@ void MainWindow::on_clkButton_clicked()
     }
     else
     {
-        /********************************************************
-        Continue executing, to finish all started instructions
-        ********************************************************/
+        //Continue executing, to finish all started instructions
         checkReservationStations();
         showRegValues();
         showResStations();
@@ -309,12 +325,23 @@ void MainWindow::on_clkButton_clicked()
 
     clkCycle++;
 
+    if (divisionByZero)
+    {
+        on_resetButton_clicked();
+        ui->resetButton->setEnabled(false);
+        ui->startButton->setEnabled(false);
+    }
+
 }
 
 void MainWindow::on_skipButton_clicked()
 {
     for (int i = 0; i < 10; i++)
+    {
         on_clkButton_clicked();
+        if (divisionByZero)
+                break;
+    }
 }
 
 void MainWindow::initAlgorithm()
@@ -379,10 +406,12 @@ void MainWindow::shiftQueue()
 
 void MainWindow::on_startButton_clicked()
 {
-    resetStationsAndRegisters();
-    cleanFields();
+    resetProcessor();
+    cleanQueue();
+    showRegValues();
+    showResStations();
+    showMemory();
     nextInstruction = 0;
-    memText = "";
     initAlgorithm();
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(true);
@@ -393,18 +422,21 @@ void MainWindow::on_startButton_clicked()
 
 void MainWindow::on_resetButton_clicked()
 {
-    resetStationsAndRegisters();
-    cleanFields();
+    resetProcessor();
+    cleanQueue();
+    showRegValues();
+    showResStations();
+    showMemory();
     nextInstruction = 0;
-    memText = "";
     code = "";
     ui->compile_label->setText("");
     ui->startButton->setEnabled(true);
     ui->clkButton->setEnabled(false);
     ui->skipButton->setEnabled(false);
+    ui->clkLabel->setText("");
 }
 
-void MainWindow::cleanFields()
+void MainWindow::cleanQueue()
 {
     QString labelName;
     QLabel* targetLabel;
@@ -415,59 +447,6 @@ void MainWindow::cleanFields()
         targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText("");
     }
-
-    for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
-    {
-        labelName = "addsOp_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-        labelName = "addsVj_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-        labelName = "addsVk_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-    }
-
-    for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
-    {
-        labelName = "load_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-    }
-
-    for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
-    {
-        labelName = "mulsOp_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-        labelName = "mulsVj_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-        labelName = "mulsVk_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-    }
-
-    for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
-    {
-        labelName = "storeReg_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-        labelName = "storeAddr_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText("");
-    }
-
-    for (int i = 0; i < NUM_OF_REGISTERS; i++)
-    {
-        labelName = "x_" + QString::number(i);
-        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-        targetLabel->setText(QString::number(registers[i].getValue()));
-    }
-
-    ui->memTextEdit->setText("");
-    ui->clkLabel->setText("");
 }
 
 bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk)
@@ -596,7 +575,20 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
                         stationsLoad[i].setAddr(address);
 
                         //load station is working only when memory is available
-                        stationsLoad[i].setWorking(false);
+                        if (memoryPortA == false)
+                        {
+                            stationsLoad[i].setWorking(true);
+                            stationsLoad[i].setPort("A");
+                            memoryPortA = true;
+                        }
+                        else if (memoryPortB == false)
+                        {
+                            stationsLoad[i].setWorking(true);
+                            stationsLoad[i].setPort("B");
+                            memoryPortB = true;
+                        }
+                        else
+                            stationsLoad[i].setWorking(false);
 
                         notBusy = true;
 
@@ -666,20 +658,36 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
                         stationsStore[i].setAtCycle(0);
                         stationsStore[i].setAddr(address);
 
-                        //store station is working only when memory and vj value are available
-                        stationsStore[i].setWorking(false);
-
                         if (registers[regNumberJ].getQ() == "")
                         {
                             //write value
                             stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
                             //stationsStore[i].setQj("");
+
+                            //store station is working only when memory and vj value are available
+                            if (memoryPortA == false)
+                            {
+                                stationsStore[i].setWorking(true);
+                                stationsStore[i].setPort("A");
+                                memoryPortA = true;
+                            }
+                            else if (memoryPortB == false)
+                            {
+                                stationsStore[i].setWorking(true);
+                                stationsStore[i].setPort("B");
+                                memoryPortB = true;
+                            }
+                            else
+                                stationsStore[i].setWorking(false);
                         }
                         else
                         {
                             //write only reg name (f1, f2 ...)
                             stationsStore[i].setVj(vj);
                             stationsStore[i].setQj(registers[regNumberJ].getQ());
+
+                            //vj value is not available, so store station is not working
+                            stationsStore[i].setWorking(false);
                         }
 
                         notBusy = true;
@@ -782,7 +790,7 @@ void MainWindow::checkReservationStations()
     Analyze war waw rar and raw hazards
     ********************************************************/
 
-    QList<QPair<int, QString>> cdb; //common data bus, (result, station name)
+    QList<QPair<int, QString>> cdb; //common data bus: (result, station name)
 
     //Step 1: Check if working stations finished and send results on CDB
 
@@ -827,6 +835,14 @@ void MainWindow::checkReservationStations()
             {
                 if (stationsMulDiv[i].getAtCycle() == DIV_CLK_LATENCY)
                 {
+                    //If division by zero occurs -> reset simulator
+                    if (stationsMulDiv[i].getQk().toInt() == 0)
+                    {
+                        QMessageBox::critical(this, "Division By Zero",
+                                              "Division by zero is undefined. Application is not able to continue execution. "
+                                              "Click OK to reset simulator.");
+                        divisionByZero = true;
+                    }
                     int result = stationsMulDiv[i].calculate();
                     cdb.append(QPair<int, QString>(result, MULDIV_STATIONS_NAME + QString::number(i)));
                 }
@@ -834,29 +850,25 @@ void MainWindow::checkReservationStations()
         }
     }
 
-    /********************************************************
-    Solve memoryBusy problem. If somebody is writing, mem is busy
-    load and store instructions in stations/buffers can finish
-    out of order (in buffer are only instructions with different
-    addresses)
-    example: one load and one store is allowed in one clk
-    counter counts that. This is just about resources, not algorithm
-    *********************************************************/
+    if (divisionByZero)
+        return;
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
         if (stationsLoad[i].getBusy() && stationsLoad[i].getWorking())
         {
-            if (stationsLoad[i].getAtCycle() >= LOAD_CLK_LATENCY)
+            if (stationsLoad[i].getAtCycle() == LOAD_CLK_LATENCY)
             {
+                if (stationsLoad[i].getPort() == "A")
+                    memoryPortA = false;
+                else if (stationsLoad[i].getPort() == "B")
+                    memoryPortB = false;
+                else
+                    qDebug() << "Problem in memory port logic.";
+
                 int result = memory[stationsLoad[i].getAddr()];
                 stationsLoad[i].read();
                 cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
-                /********************************************************
-                free memory resource to other
-                (if station is in working state, it means it holds resource)
-                similar as unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                ********************************************************/
             }
         }
     }
@@ -867,14 +879,16 @@ void MainWindow::checkReservationStations()
         {
             if (stationsStore[i].getAtCycle() == LOAD_CLK_LATENCY)
             {
+                if (stationsStore[i].getPort() == "A")
+                    memoryPortA = false;
+                else if (stationsStore[i].getPort() == "B")
+                    memoryPortB = false;
+                else
+                    qDebug() << "Problem in memory port logic.";
+
                 memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
                 stationsStore[i].write();
                 //store does not send anything on cdb
-                /********************************************************
-                free memory resource to other
-                (if station is in working state, it means it holds resource)
-                similar as unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                ********************************************************/
             }
         }
     }
@@ -927,15 +941,27 @@ void MainWindow::checkReservationStations()
         }
     }
 
+    /********************************************************
+    This logic will prioritize loads for memory (make these accesses fair)
+    ********************************************************/
+
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
-        if (stationsLoad[i].getBusy() && !stationsMulDiv[i].getWorking())
+        if (stationsLoad[i].getBusy() && !stationsLoad[i].getWorking())
         {
-            /********************************************************
-            check if memory resource is available
-            if it is -> stationsLoad[i].setWorking(true); it will be used next cycle
-            reserve memory resource
-            ********************************************************/
+            //check if memory port is available
+            if (memoryPortA == false)
+            {
+                stationsLoad[i].setWorking(true);
+                stationsLoad[i].setPort("A");
+                memoryPortA = true;
+            }
+            else if (memoryPortB == false)
+            {
+                stationsLoad[i].setWorking(true);
+                stationsLoad[i].setPort("B");
+                memoryPortB = true;
+            }
         }
     }
 
@@ -951,13 +977,23 @@ void MainWindow::checkReservationStations()
                     stationsStore[i].setQj("");
                 }
             }
-            //check if reservation station is completed and resource is available
-            /********************************************************
-            check if memory resource is available
-            if (stationsStore[i].getQj() == "" &&  ... mem available ...)
-            if it is -> stationsStore[i].setWorking(true); it will be used next cycle
-            reserve memory resource
-            ********************************************************/
+
+            //check if reservation station is completed and memory port is available
+            if (stationsStore[i].getQj() == "")
+            {
+                if (memoryPortA == false)
+                {
+                    stationsStore[i].setWorking(true);
+                    stationsStore[i].setPort("A");
+                    memoryPortA = true;
+                }
+                else if (memoryPortB == false)
+                {
+                    stationsStore[i].setWorking(true);
+                    stationsStore[i].setPort("B");
+                    memoryPortB = true;
+                }
+            }
         }
     }
 
@@ -986,33 +1022,6 @@ void MainWindow::markRegisterBusy(QString reg, QString stationName, QString stat
         qDebug() << "Problem with registers in instructions.";
 
     registers[regNumber].setQ(stationName + stationNumber);
-}
-
-void MainWindow::markMemoryElementBusy(QString address)
-{
-    //only load needs to check ih memory element is busy (called before read method of class ReservationStationLoad)
-    //if it is busy, wait untill element is stable, and then load it in register
-    memoryBusy[address.toInt()] = true;
-    memText.append("Location " + address + " is busy.\n");
-    ui->memTextEdit->setText(memText);
-}
-
-void MainWindow::unmarkMemoryElementBusy(QString address)
-{
-    memoryBusy[address.toInt()] = false;
-    memText = ui->memTextEdit->toPlainText();
-
-    QStringList memString = memText.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
-    QString newMemText;
-    for (int i = 0; i < memString.size(); i++)
-    {
-        if (memString[i].compare("Location " + address + " is busy.") == 0)
-        {
-            newMemText.append(memString[i]);
-        }
-    }
-    memText = newMemText;
-    ui->memTextEdit->setText(memText);
 }
 
 void MainWindow::showRegValues()
@@ -1133,13 +1142,26 @@ void MainWindow::showMemory()
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
         QTableWidgetItem *data= new QTableWidgetItem(QString::number(memory[i]));
-        if (memoryBusy[i])
-            data->setBackground(QBrush(QColor(Qt::red).lighter(160)));
         ui->memoryTable->setItem(i, 1, data);
     }
+    QTableWidgetItem *portA = new QTableWidgetItem("Port A");
+    portA->setTextAlignment(Qt::AlignCenter);
+    if (memoryPortA)
+        portA->setBackground(QBrush(QColor(Qt::red).lighter(160)));
+    else
+        portA->setBackground(QBrush(QColor(Qt::white)));
+    ui->portTable->setItem(0, 0, portA);
+
+    QTableWidgetItem *portB = new QTableWidgetItem("Port B");
+    portB->setTextAlignment(Qt::AlignCenter);
+    if (memoryPortB)
+        portB->setBackground(QBrush(QColor(Qt::red).lighter(160)));
+    else
+        portB->setBackground(QBrush(QColor(Qt::white)));
+    ui->portTable->setItem(0, 1, portB);
 }
 
-void MainWindow::resetStationsAndRegisters()
+void MainWindow::resetProcessor()
 {
     //reset stations
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
@@ -1159,6 +1181,7 @@ void MainWindow::resetStationsAndRegisters()
         stationsLoad[i].setAddr(0);
         stationsLoad[i].setAtCycle(0);
         stationsLoad[i].setWorking(false);
+        stationsLoad[i].setPort("");
     }
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
@@ -1179,6 +1202,7 @@ void MainWindow::resetStationsAndRegisters()
         stationsStore[i].setQj("");
         stationsStore[i].setAtCycle(0);
         stationsStore[i].setWorking(false);
+        stationsStore[i].setPort("");
     }
 
     //reset registers
@@ -1187,5 +1211,12 @@ void MainWindow::resetStationsAndRegisters()
         registers[i].setQ("");
         registers[i].setValue(0);
     }
+
+    //reset memory
+    for (int i = 0; i < MEMORY_SIZE; i++)
+        memory[i] = 0;
+
+    memoryPortA = false;
+    memoryPortB = false;
 }
 

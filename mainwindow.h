@@ -17,7 +17,7 @@ public:
     void compileProgram();
     void initAlgorithm();
     void shiftQueue();
-    void cleanFields();
+    void cleanQueue();
     bool fillReservationStationAdders(QString op, QString resReg, QString vj, QString vk);
     bool fillReservationStationLoads(QString resReg, QString imm, QString addrReg);
     bool fillReservationStationStores(QString vj, QString imm, QString addrReg);
@@ -29,7 +29,7 @@ public:
     void showRegValues();
     void showResStations();
     void showMemory();
-    void resetStationsAndRegisters();
+    void resetProcessor();
 
 private slots:
     void on_compileButton_clicked();

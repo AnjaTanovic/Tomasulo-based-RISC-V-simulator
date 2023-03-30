@@ -19,7 +19,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>344</width>
+      <width>291</width>
       <height>581</height>
      </rect>
     </property>
@@ -673,20 +673,10 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="memTextEdit">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>620</y>
-      <width>121</width>
-      <height>91</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QTableWidget" name="memoryTable">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>320</x>
       <y>20</y>
       <width>121</width>
       <height>581</height>
@@ -732,7 +722,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>212</x>
+      <x>200</x>
       <y>620</y>
       <width>111</width>
       <height>29</height>
@@ -740,6 +730,16 @@
     </property>
     <property name="text">
      <string>Skip 10 clocks</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="portTable">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>610</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
     </property>
    </widget>
    <zorder>picture_label</zorder>
@@ -784,10 +784,10 @@
    <zorder>storeReg_2</zorder>
    <zorder>storeReg_3</zorder>
    <zorder>storeReg_4</zorder>
-   <zorder>memTextEdit</zorder>
    <zorder>memoryTable</zorder>
    <zorder>clkLabel</zorder>
    <zorder>skipButton</zorder>
+   <zorder>portTable</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -6,6 +6,7 @@ ReservationStationLoad::ReservationStationLoad()
     this->addr = 0;
     this->atCycle = 0;
     this->working = false;
+    this->port = "";
 }
 
 void ReservationStationLoad::setBusy(bool busy)
@@ -28,6 +29,11 @@ void ReservationStationLoad::setWorking(bool working)
     this->working = working;
 }
 
+void ReservationStationLoad::setPort(QString port)
+{
+    this->port = port;
+}
+
 bool ReservationStationLoad::getBusy()
 {
     return busy;
@@ -48,10 +54,16 @@ bool ReservationStationLoad::getWorking()
     return working;
 }
 
+QString ReservationStationLoad::getPort()
+{
+    return port;
+}
+
 void ReservationStationLoad::read()
 {
     busy = false;
     addr = 0;
     atCycle = 0;
     working = false;
+    port = "";
 }
