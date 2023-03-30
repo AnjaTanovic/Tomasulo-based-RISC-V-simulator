@@ -481,7 +481,6 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
         {
             stationsAddSub[i].setBusy(true);
             stationsAddSub[i].setOp(op);
-            stationsAddSub[i].setResReg(resReg);
             stationsAddSub[i].setAtCycle(0);
 
             //OPERANDS
@@ -560,124 +559,142 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
 bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
+    bool sameAddr = false; //true if at least one of store buffers has the same address as load address
 
-    for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
+    int regNumber = 0;
+    int address = 0;
+    QRegularExpression regularRegister("^[xX]([0-3])$");
+    if (regularRegister.match(addrReg).hasMatch())
     {
-        if (stationsLoad[i].getBusy() == false)
+        regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
+
+        //check if address register value is correct
+        if (registers[regNumber].getQ() == "")
         {
-            stationsLoad[i].setBusy(true);
-            stationsLoad[i].setImm(imm);
-            stationsLoad[i].setResReg(resReg);
-            stationsLoad[i].setAtCycle(0);
-
-            //show instruction on gui
-
-            //ADDRESS REGISTER
-
-            int regNumber = 0;
-            QRegularExpression regularRegister("^[xX]([0-3])$");
-            if (regularRegister.match(addrReg).hasMatch())
+            //calculate address
+            address = imm.toInt() + registers[regNumber].getValue();
+            //check if store buffers contain the same address
+            for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
             {
-                regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
-                if (registers[regNumber].getQ() == "")
+                if (stationsStore[i].getBusy() && address == stationsStore[i].getAddr())
                 {
-                    //calculate address and write value
-                    stationsLoad[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                    stationsLoad[i].setAddr(imm.toInt() + registers[regNumber].getValue());
-
-                    /**************************************************
-                    first check if there is store with the same address in buffers
-
-                    stationsLoad[i].setWorking(true); notBusy
-                    if busy, reset stationsLoad[i]
-                    and dont mark register
-                    **************************************************/
-                }
-                else
-                {
-                    //write reg name
-                    stationsLoad[i].setAddrReg(addrReg);
-                    stationsLoad[i].setQ(registers[regNumber].getQ());
-                    stationsLoad[i].setAddr(-1);
+                    sameAddr = true;
+                    break;
                 }
             }
+            if (sameAddr)
+                qDebug() << "Load is waiting for stores with same addresses to finish (preventing hazards).";
             else
-                qDebug() << "Problem with registers in instructions.";
+            {
+                //everything with address is ok
+                for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
+                {
+                    if (stationsLoad[i].getBusy() == false)
+                    {
+                        stationsLoad[i].setBusy(true);
+                        stationsLoad[i].setAtCycle(0);
+                        stationsLoad[i].setAddr(address);
 
-            notBusy = true;
+                        //load station is working only when memory is available
+                        stationsLoad[i].setWorking(false);
 
-            markRegisterBusy(resReg, LOAD_STATIONS_NAME, QString::number(i));
+                        notBusy = true;
 
-            break;
+                        markRegisterBusy(resReg, LOAD_STATIONS_NAME, QString::number(i));
+
+                        break;
+                    }
+                }
+            }
         }
+        else
+            qDebug() << "Load is waiting for address register to become available.";
     }
+    else
+        qDebug() << "Problem with registers in instructions.";
+
     return notBusy;
 }
 
 bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString addrReg)
 {
     bool notBusy = false; //true if at least one of stations is not busy, otherwise false (all busy)
-    int allReady = 0;
+    bool sameAddr = false; //true if at least one of store buffers has the same address as load address
 
-    for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
+    int regNumber = 0;
+    int regNumberJ = 0;
+    int address = 0;
+    QRegularExpression regularRegister("^[xX]([0-3])$");
+    if (regularRegister.match(addrReg).hasMatch() && regularRegister.match(vj).hasMatch())
     {
-        if (stationsStore[i].getBusy() == false)
+        regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
+        regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
+
+        //check if address register value is correct
+        if (registers[regNumber].getQ() == "")
         {
-            stationsStore[i].setBusy(true);
-            stationsStore[i].setImm(imm);
-            stationsStore[i].setAtCycle(0);
-
-            //ADDRESS REGISTER AND REGISTER FOR STORE
-
-            int regNumber = 0;
-            int regNumberJ = 0;
-            QRegularExpression regularRegister("^[xX]([0-3])$");
-            if (regularRegister.match(addrReg).hasMatch() && regularRegister.match(vj).hasMatch())
+            //calculate address
+            address = imm.toInt() + registers[regNumber].getValue();
+            //check if store buffers contain the same address
+            for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
             {
-                regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
-                regNumberJ = (regularRegister.match(vj).captured(1)).toInt();
-                if (registers[regNumber].getQ() == "")
+                if (stationsStore[i].getBusy() && address == stationsStore[i].getAddr())
                 {
-                    //calculate address and write value
-                    stationsStore[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                    stationsStore[i].setAddr(imm.toInt() + registers[regNumber].getValue());
-                    markMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                    allReady++;
-                }
-                else
-                {
-                    //write reg name
-                    stationsStore[i].setAddrReg(addrReg);
-                    stationsStore[i].setQ(registers[regNumber].getQ());
-                    stationsStore[i].setAddr(-1);
-                }
-
-                if (registers[regNumberJ].getQ() == "")
-                {
-                    //write value
-                    stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
-                    //stationsStore[i].setQj("");
-                    allReady++;
-                }
-                else
-                {
-                    //write only reg name (f1, f2 ...)
-                    stationsStore[i].setVj(vj);
-                    stationsStore[i].setQj(registers[regNumberJ].getQ());
+                    sameAddr = true;
+                    break;
                 }
             }
+            //check if load buffers contain the same address
+            for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
+            {
+                if (stationsLoad[i].getBusy() && address == stationsLoad[i].getAddr())
+                {
+                    sameAddr = true;
+                    break;
+                }
+            }
+            if (sameAddr)
+                qDebug() << "Store is waiting for loads and stores with same addresses to finish (preventing hazards).";
             else
-                qDebug() << "Problem with registers in instructions.";
+            {
+                //everything with address is ok
+                for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
+                {
+                    if (stationsStore[i].getBusy() == false)
+                    {
+                        stationsStore[i].setBusy(true);
+                        stationsStore[i].setAtCycle(0);
+                        stationsStore[i].setAddr(address);
 
-            if (allReady == 2)
-                stationsStore[i].setWorking(true);
+                        //store station is working only when memory and vj value are available
+                        stationsStore[i].setWorking(false);
 
-            notBusy = true;
+                        if (registers[regNumberJ].getQ() == "")
+                        {
+                            //write value
+                            stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
+                            //stationsStore[i].setQj("");
+                        }
+                        else
+                        {
+                            //write only reg name (f1, f2 ...)
+                            stationsStore[i].setVj(vj);
+                            stationsStore[i].setQj(registers[regNumberJ].getQ());
+                        }
 
-            break;
+                        notBusy = true;
+
+                        break;
+                    }
+                }
+            }
         }
-        allReady = 0;
+        else
+            qDebug() << "Load is waiting for address register to become available.";
     }
+    else
+        qDebug() << "Problem with registers in instructions.";
+
     return notBusy;
 }
 
@@ -692,7 +709,6 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
         {
             stationsMulDiv[i].setBusy(true);
             stationsMulDiv[i].setOp(op);
-            stationsMulDiv[i].setResReg(resReg);
             stationsMulDiv[i].setAtCycle(0);
 
             //OPERANDS
@@ -760,7 +776,7 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 void MainWindow::checkReservationStations()
 {
     //For all busy and working reservation stations -> check if they have finished their work
-    //For all busy reservation stations which are waiting for operands -> check if they are computed in this cycle
+    //For all busy reservation stations which are waiting for operands -> check if operands are computed in this cycle
 
     /********************************************************
     Analyze war waw rar and raw hazards
@@ -833,13 +849,14 @@ void MainWindow::checkReservationStations()
         {
             if (stationsLoad[i].getAtCycle() >= LOAD_CLK_LATENCY)
             {
-                //Check if memory element is busy
-                if (!memoryBusy[stationsLoad[i].getAddr()])
-                {
-                    int result = memory[stationsLoad[i].getAddr()];
-                    stationsLoad[i].read();
-                    cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
-                }
+                int result = memory[stationsLoad[i].getAddr()];
+                stationsLoad[i].read();
+                cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
+                /********************************************************
+                free memory resource to other
+                (if station is in working state, it means it holds resource)
+                similar as unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
+                ********************************************************/
             }
         }
     }
@@ -850,10 +867,14 @@ void MainWindow::checkReservationStations()
         {
             if (stationsStore[i].getAtCycle() == LOAD_CLK_LATENCY)
             {
-                unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
                 memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
                 stationsStore[i].write();
                 //store does not send anything on cdb
+                /********************************************************
+                free memory resource to other
+                (if station is in working state, it means it holds resource)
+                similar as unmarkMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
+                ********************************************************/
             }
         }
     }
@@ -910,12 +931,11 @@ void MainWindow::checkReservationStations()
     {
         if (stationsLoad[i].getBusy() && !stationsMulDiv[i].getWorking())
         {
-            for (int j = 0; j < cdb.size(); j++)
-            {
-
-            }
-            //completed reservation station
-
+            /********************************************************
+            check if memory resource is available
+            if it is -> stationsLoad[i].setWorking(true); it will be used next cycle
+            reserve memory resource
+            ********************************************************/
         }
     }
 
@@ -925,10 +945,19 @@ void MainWindow::checkReservationStations()
         {
             for (int j = 0; j < cdb.size(); j++)
             {
-
+                if (stationsStore[i].getQj() == cdb[j].second)
+                {
+                    stationsStore[i].setVj(QString::number(cdb[j].first));
+                    stationsStore[i].setQj("");
+                }
             }
-            //completed reservation station
-
+            //check if reservation station is completed and resource is available
+            /********************************************************
+            check if memory resource is available
+            if (stationsStore[i].getQj() == "" &&  ... mem available ...)
+            if it is -> stationsStore[i].setWorking(true); it will be used next cycle
+            reserve memory resource
+            ********************************************************/
         }
     }
 
@@ -943,96 +972,6 @@ void MainWindow::checkReservationStations()
             }
         }
     }
-
-/*
-            else
-            {
-                bool numOk;
-
-                //check addrReg
-                stationsLoad[i].getAddrReg().toInt(&numOk);
-                if (!numOk)
-                {
-                    int regNumber = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsLoad[i].getAddrReg()).hasMatch())
-                    {
-                        regNumber = (regularRegister.match(stationsLoad[i].getAddrReg()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumber].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsLoad[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                        stationsLoad[i].setAddr(stationsLoad[i].getImm().toInt() + registers[regNumber].getValue());
-                        stationsLoad[i].setWorking(true);
-                    }
-
-                }
-            }
-        }
-    }
-            else
-            {
-                int allReady = 0;
-                bool numOk;
-
-                //check Vj
-                stationsStore[i].getVj().toInt(&numOk);
-                if (!numOk)
-                {
-                    int regNumberJ = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsStore[i].getVj()).hasMatch())
-                    {
-                        regNumberJ = (regularRegister.match(stationsStore[i].getVj()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumberJ].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsStore[i].setVj(QString::number(registers[regNumberJ].getValue()));
-                        allReady++;
-                    }
-                }
-                else
-                    allReady++;
-
-                //check addrReg
-                stationsStore[i].getAddrReg().toInt(&numOk);
-                if (!numOk)
-                {
-                    int regNumber = 0;
-                    QRegularExpression regularRegister("^[xX]([0-3])$");
-                    if (regularRegister.match(stationsStore[i].getAddrReg()).hasMatch())
-                    {
-                        regNumber = (regularRegister.match(stationsStore[i].getAddrReg()).captured(1)).toInt();
-                    }
-                    else
-                        qDebug() << "Problem with registers in instructions.";
-
-                    regBusy = registers[regNumber].getBusy();
-                    if (!regBusy)
-                    {
-                        stationsStore[i].setAddrReg(QString::number(registers[regNumber].getValue()));
-                        stationsStore[i].setAddr(stationsStore[i].getImm().toInt() + registers[regNumber].getValue());
-                        markMemoryElementBusy(QString::number(stationsStore[i].getAddr()));
-                        allReady++;
-                    }
-                }
-                else
-                    allReady++;
-
-                if (allReady == 2)
-                    stationsStore[i].setWorking(true);
-            }
-        }
-    }
-*/
 }
 
 void MainWindow::markRegisterBusy(QString reg, QString stationName, QString stationNumber)
@@ -1128,10 +1067,7 @@ void MainWindow::showResStations()
         {
             labelName = "load_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            if (stationsLoad[i].getAddr() != -1)
-                targetLabel->setText(QString::number(stationsLoad[i].getAddr()));
-            else
-                targetLabel->setText(stationsLoad[i].getImm() + "(" + stationsLoad[i].getAddrReg() + ")");
+            targetLabel->setText(QString::number(stationsLoad[i].getAddr()));
         }
         else
         {
@@ -1178,10 +1114,7 @@ void MainWindow::showResStations()
             targetLabel->setText(stationsStore[i].getVj());
             labelName = "storeAddr_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            if (stationsStore[i].getAddr() != -1)
-                targetLabel->setText(QString::number(stationsStore[i].getAddr()));
-            else
-                targetLabel->setText(stationsStore[i].getImm() + "(" + stationsStore[i].getAddrReg() + ")");
+            targetLabel->setText(QString::number(stationsStore[i].getAddr()));
         }
         else
         {
@@ -1214,29 +1147,38 @@ void MainWindow::resetStationsAndRegisters()
         stationsAddSub[i].setBusy(false);
         stationsAddSub[i].setOp("");
         stationsAddSub[i].setVj("");
+        stationsAddSub[i].setQj("");
         stationsAddSub[i].setVk("");
+        stationsAddSub[i].setQk("");
         stationsAddSub[i].setAtCycle(0);
+        stationsAddSub[i].setWorking(false);
     }
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
         stationsLoad[i].setBusy(false);
         stationsLoad[i].setAddr(0);
         stationsLoad[i].setAtCycle(0);
+        stationsLoad[i].setWorking(false);
     }
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
         stationsMulDiv[i].setBusy(false);
         stationsMulDiv[i].setOp("");
         stationsMulDiv[i].setVj("");
+        stationsMulDiv[i].setQj("");
         stationsMulDiv[i].setVk("");
+        stationsMulDiv[i].setQk("");
         stationsMulDiv[i].setAtCycle(0);
+        stationsMulDiv[i].setWorking(false);
     }
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
     {
         stationsStore[i].setBusy(false);
         stationsStore[i].setAddr(0);
         stationsStore[i].setVj("");
+        stationsStore[i].setQj("");
         stationsStore[i].setAtCycle(0);
+        stationsStore[i].setWorking(false);
     }
 
     //reset registers

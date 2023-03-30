@@ -3,9 +3,6 @@
 ReservationStationStore::ReservationStationStore()
 {
     this->busy = false;
-    this->addrReg = "";
-    this->q = "";
-    this->imm = "";
     this->addr = 0;
     this->vj = "";
     this->qj = "";
@@ -16,21 +13,6 @@ ReservationStationStore::ReservationStationStore()
 void ReservationStationStore::setBusy(bool busy)
 {
     this->busy = busy;
-}
-
-void ReservationStationStore::setAddrReg(QString addrReg)
-{
-    this->addrReg = addrReg;
-}
-
-void ReservationStationStore::setQ(QString q)
-{
-    this->q = q;
-}
-
-void ReservationStationStore::setImm(QString imm)
-{
-    this->imm = imm;
 }
 
 void ReservationStationStore::setAddr(int addr)
@@ -63,21 +45,6 @@ bool ReservationStationStore::getBusy()
     return busy;
 }
 
-QString ReservationStationStore::getAddrReg()
-{
-    return addrReg;
-}
-
-QString ReservationStationStore::getQ()
-{
-    return q;
-}
-
-QString ReservationStationStore::getImm()
-{
-    return imm;
-}
-
 int ReservationStationStore::getAddr()
 {
     return addr;
@@ -106,9 +73,6 @@ bool ReservationStationStore::getWorking()
 void ReservationStationStore::write()
 {
     busy = false;
-    addrReg = "";
-    q = "";
-    imm = "";
     addr = 0;
     vj = "";
     qj = "";
