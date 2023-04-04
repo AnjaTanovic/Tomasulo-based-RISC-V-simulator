@@ -42,12 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QPixmap pix(":/img/img/tomasulo.png");
-
-    int w = ui->picture_label->width();
-    int h = ui->picture_label->height();
-    ui->picture_label->setPixmap(pix.scaled(w,h,Qt::KeepAspectRatio));
-    //ui->picture_label->setPixmap(pix.scaled(200,200, Qt::KeepAspectRatio));
 
     //create reservation stations
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
@@ -82,7 +76,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->memoryTable->setColumnCount(2);
     ui->memoryTable->setRowCount(MEMORY_SIZE);
     ui->memoryTable->verticalHeader()->setVisible(false);
-    ui->memoryTable->horizontalHeader()->setVisible(false);
+    //ui->memoryTable->horizontalHeader()->setVisible(false);
+    QStringList memColumns = { "Address", "Value"};
+    ui->memoryTable->setHorizontalHeaderLabels(memColumns);
     ui->memoryTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
@@ -147,10 +143,10 @@ void MainWindow::compileProgram()
     //Checking format
     for (int i = 0; i < instructionsString.size(); i++)
     {
-        QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-3])\\s*,\\s*([xX][0-3])\\s*,\\s*([xX][0-3])\\s*$");
-        QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-3])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-3])\\s*$");
-        QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-3])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-3])\\s*[)]\\s*$");
-        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-3])\\s*,\\s*([xX][0-3])\\s*,\\s*([0-9]+)\\s*$");
+        QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([xX][0-5])\\s*$");
+        QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
+        QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
+        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([0-9]+)\\s*$");
 
         if (regularInstruction1.match(instructionsString[i]).hasMatch())
         {
@@ -467,7 +463,7 @@ bool MainWindow::fillReservationStationAdders(QString op, QString resReg, QStrin
             int regNumberJ = 0;
             int regNumberK = 0; //string vj can be register or immediate
             bool vkIsImm = false;
-            QRegularExpression regularRegister("^[xX]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-5])$");
 
             //Vj
             if (regularRegister.match(vj).hasMatch())
@@ -542,7 +538,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
 
     int regNumber = 0;
     int address = 0;
-    QRegularExpression regularRegister("^[xX]([0-3])$");
+    QRegularExpression regularRegister("^[xX]([0-5])$");
     if (regularRegister.match(addrReg).hasMatch())
     {
         regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
@@ -616,7 +612,7 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
     int regNumber = 0;
     int regNumberJ = 0;
     int address = 0;
-    QRegularExpression regularRegister("^[xX]([0-3])$");
+    QRegularExpression regularRegister("^[xX]([0-5])$");
     if (regularRegister.match(addrReg).hasMatch() && regularRegister.match(vj).hasMatch())
     {
         regNumber = (regularRegister.match(addrReg).captured(1)).toInt();
@@ -723,7 +719,7 @@ bool MainWindow::fillReservationStationMults(QString op, QString resReg, QString
 
             int regNumberJ = 0;
             int regNumberK = 0;
-            QRegularExpression regularRegister("^[xX]([0-3])$");
+            QRegularExpression regularRegister("^[xX]([0-5])$");
 
             //Vj
             if (regularRegister.match(vj).hasMatch())
@@ -1013,7 +1009,7 @@ void MainWindow::checkReservationStations()
 void MainWindow::markRegisterBusy(QString reg, QString stationName, QString stationNumber)
 {
     int regNumber = 0;
-    QRegularExpression regularRegister("^[xX]([0-3])$");
+    QRegularExpression regularRegister("^[xX]([0-5])$");
     if (regularRegister.match(reg).hasMatch())
     {
         regNumber = (regularRegister.match(reg).captured(1)).toInt();
@@ -1034,6 +1030,9 @@ void MainWindow::showRegValues()
         labelName = "x_" + QString::number(i);
         targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
         targetLabel->setText(QString::number(registers[i].getValue()));
+        labelName = "xq_" + QString::number(i);
+        targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
+        targetLabel->setText(registers[i].getQ());
     }
 }
 
@@ -1048,7 +1047,10 @@ void MainWindow::showResStations()
         {
             labelName = "addsOp_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsAddSub[i].getOp());
+            if (stationsAddSub[i].getOp() == "add")
+                targetLabel->setText("+");
+            else
+                targetLabel->setText("-");
             labelName = "addsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(stationsAddSub[i].getVj());
@@ -1092,7 +1094,10 @@ void MainWindow::showResStations()
         {
             labelName = "mulsOp_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsMulDiv[i].getOp());
+            if (stationsMulDiv[i].getOp() == "mul")
+                    targetLabel->setText("*");
+                else
+                    targetLabel->setText("/");
             labelName = "mulsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(stationsMulDiv[i].getVj());

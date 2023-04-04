@@ -6,9 +6,9 @@
 #define NUM_OF_STORE_STATIONS 5
 #define NUM_OF_MULDIV_STATIONS 2
 
-#define NUM_OF_REGISTERS 4
+#define NUM_OF_REGISTERS 6
 
-#define MEMORY_SIZE 1000
+#define MEMORY_SIZE 512
 
 #define QUEUE_SIZE 6
 
