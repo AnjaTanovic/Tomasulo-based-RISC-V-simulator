@@ -34,7 +34,11 @@ compile is not real compiling, change word
 ********************************************************/
 
 /********************************************************
-Draw a diagram or use tables for showing stations
+Fit tables with diagram
+********************************************************/
+
+/********************************************************
+qDebug messages -> compileOutput messages
 ********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,16 +53,49 @@ MainWindow::MainWindow(QWidget *parent)
         ReservationStationAddSub stAddSub;
         stationsAddSub.append(stAddSub);
     }
+
+    ui->add_0->setColumnCount(1);
+    ui->add_0->setRowCount(1);
+    ui->add_0->verticalHeader()->setVisible(false);
+    ui->add_0->horizontalHeader()->setVisible(false);
+    ui->add_0->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    ui->add_1->setColumnCount(1);
+    ui->add_1->setRowCount(1);
+    ui->add_1->verticalHeader()->setVisible(false);
+    ui->add_1->horizontalHeader()->setVisible(false);
+    ui->add_1->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    ui->add_2->setColumnCount(1);
+    ui->add_2->setRowCount(1);
+    ui->add_2->verticalHeader()->setVisible(false);
+    ui->add_2->horizontalHeader()->setVisible(false);
+    ui->add_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
         ReservationStationLoad stLoad;
         stationsLoad.append(stLoad);
     }
+
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
         ReservationStationMulDiv stMulDiv;
         stationsMulDiv.append(stMulDiv);
     }
+
+    ui->mul_0->setColumnCount(1);
+    ui->mul_0->setRowCount(1);
+    ui->mul_0->verticalHeader()->setVisible(false);
+    ui->mul_0->horizontalHeader()->setVisible(false);
+    ui->mul_0->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    ui->mul_1->setColumnCount(1);
+    ui->mul_1->setRowCount(1);
+    ui->mul_1->verticalHeader()->setVisible(false);
+    ui->mul_1->horizontalHeader()->setVisible(false);
+    ui->mul_1->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
     {
         ReservationStationStore stStore;
@@ -231,7 +268,7 @@ void MainWindow::compileProgram()
     {
         if (numberOfInstructions > 0)
         {
-            ui->compile_label->setText("Code is compiled successfuly.");
+            ui->compileOutput->setText("Code is compiled successfuly.");
             ui->startButton->setEnabled(true);
             ui->clkButton->setEnabled(false);
             ui->skipButton->setEnabled(false);
@@ -239,12 +276,12 @@ void MainWindow::compileProgram()
         }
         else
         {
-            ui->compile_label->setText("You have to enter the program code before compiling.");
+            ui->compileOutput->setText("You have to enter the program code before compiling.");
         }
     }
     else
     {
-        ui->compile_label->setText("Code contains errors.");
+        ui->compileOutput->setText("Code contains errors.");
         //clear all created elements of instructions list
         instructions.clear();
     }
@@ -297,25 +334,25 @@ void MainWindow::on_clkButton_clicked()
 
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
     {
-        if (stationsAddSub[i].getBusy())
+        if (stationsAddSub[i].getBusy() && stationsAddSub[i].getWorking())
             stationsAddSub[i].setAtCycle(stationsAddSub[i].getAtCycle() + 1);
     }
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
-        if (stationsLoad[i].getBusy())
+        if (stationsLoad[i].getBusy() && stationsLoad[i].getWorking())
             stationsLoad[i].setAtCycle(stationsLoad[i].getAtCycle() + 1);
     }
 
     for (int i = 0; i < NUM_OF_MULDIV_STATIONS; i++)
     {
-        if (stationsMulDiv[i].getBusy())
+        if (stationsMulDiv[i].getBusy() && stationsMulDiv[i].getWorking())
             stationsMulDiv[i].setAtCycle(stationsMulDiv[i].getAtCycle() + 1);
     }
 
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
     {
-        if (stationsStore[i].getBusy())
+        if (stationsStore[i].getBusy() && stationsStore[i].getWorking())
             stationsStore[i].setAtCycle(stationsStore[i].getAtCycle() + 1);
     }
 
@@ -412,7 +449,7 @@ void MainWindow::on_startButton_clicked()
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(true);
     ui->skipButton->setEnabled(true);
-    ui->compile_label->setText("");
+    ui->compileOutput->setText("");
     ui->clkLabel->setText("Clock cycle: " + QString::number(clkCycle));
 }
 
@@ -425,7 +462,7 @@ void MainWindow::on_resetButton_clicked()
     showMemory();
     nextInstruction = 0;
     code = "";
-    ui->compile_label->setText("");
+    ui->compileOutput->setText("");
     ui->startButton->setEnabled(true);
     ui->clkButton->setEnabled(false);
     ui->skipButton->setEnabled(false);
@@ -1040,6 +1077,8 @@ void MainWindow::showResStations()
 {
     QString labelName;
     QLabel* targetLabel;
+    QString tableName;
+    QTableWidget* targetTable;
 
     for (int i = 0; i < NUM_OF_ADDSUB_STATIONS; i++)
     {
@@ -1057,6 +1096,31 @@ void MainWindow::showResStations()
             labelName = "addsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(stationsAddSub[i].getVk());
+
+            if (stationsAddSub[i].getWorking())
+            {
+                QTableWidgetItem *add;
+                if (stationsAddSub[i].getOp() == "add")
+                    add = new QTableWidgetItem("+");
+                else
+                    add = new QTableWidgetItem("-");
+                add->setTextAlignment(Qt::AlignCenter);
+                add->setBackground(QBrush(QColor(Qt::red).lighter(160)));
+
+                tableName = "add_" + QString::number(i);
+                targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+                targetTable->setItem(0, 0, add);
+            }
+            else
+            {
+                QTableWidgetItem *add = new QTableWidgetItem("+ -");;
+                add->setTextAlignment(Qt::AlignCenter);
+                add->setBackground(QBrush(QColor(Qt::white).lighter(160)));
+
+                tableName = "add_" + QString::number(i);
+                targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+                targetTable->setItem(0, 0, add);
+            }
         }
         else
         {
@@ -1069,6 +1133,14 @@ void MainWindow::showResStations()
             labelName = "addsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText("");
+
+            QTableWidgetItem *add = new QTableWidgetItem("+ -");;
+            add->setTextAlignment(Qt::AlignCenter);
+            add->setBackground(QBrush(QColor(Qt::white).lighter(160)));
+
+            tableName = "add_" + QString::number(i);
+            targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+            targetTable->setItem(0, 0, add);
         }
     }
 
@@ -1104,6 +1176,31 @@ void MainWindow::showResStations()
             labelName = "mulsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText(stationsMulDiv[i].getVk());
+
+            if (stationsMulDiv[i].getWorking())
+            {
+                QTableWidgetItem *mul;
+                if (stationsMulDiv[i].getOp() == "mul")
+                    mul = new QTableWidgetItem("*");
+                else
+                    mul = new QTableWidgetItem("/");
+                mul->setTextAlignment(Qt::AlignCenter);
+                mul->setBackground(QBrush(QColor(Qt::red).lighter(160)));
+
+                tableName = "mul_" + QString::number(i);
+                targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+                targetTable->setItem(0, 0, mul);
+            }
+            else
+            {
+                QTableWidgetItem *mul = new QTableWidgetItem("* /");;
+                mul->setTextAlignment(Qt::AlignCenter);
+                mul->setBackground(QBrush(QColor(Qt::white).lighter(160)));
+
+                tableName = "mul_" + QString::number(i);
+                targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+                targetTable->setItem(0, 0, mul);
+            }
         }
         else
         {
@@ -1116,6 +1213,14 @@ void MainWindow::showResStations()
             labelName = "mulsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
             targetLabel->setText("");
+
+            QTableWidgetItem *mul = new QTableWidgetItem("* /");;
+            mul->setTextAlignment(Qt::AlignCenter);
+            mul->setBackground(QBrush(QColor(Qt::white).lighter(160)));
+
+            tableName = "mul_" + QString::number(i);
+            targetTable = ui->addsOp_0->parentWidget()->findChild<QTableWidget*>(tableName);
+            targetTable->setItem(0, 0, mul);
         }
     }
 
