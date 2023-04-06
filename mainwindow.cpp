@@ -15,7 +15,7 @@
 int clkCycle = 0;
 QStringList instructionsString;
 QString code;
-int nextQueueInstruction = 0; //which instruction from code is next to be inserted in queue
+int nextQueueInstruction = 0; //shows which instruction from code is next to be inserted in queue
 int nextInstruction = 0;
 int numberOfInstructions = 0;
 QList<Instruction> instructions;
@@ -31,14 +31,6 @@ bool divisionByZero = false;
 
 /********************************************************
 compile is not real compiling, change word
-********************************************************/
-
-/********************************************************
-Fit tables with diagram
-********************************************************/
-
-/********************************************************
-qDebug messages -> compileOutput messages
 ********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
@@ -116,14 +108,14 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->memoryTable->horizontalHeader()->setVisible(false);
     QStringList memColumns = { "Address", "Value"};
     ui->memoryTable->setHorizontalHeaderLabels(memColumns);
+    ui->memoryTable->setStyleSheet("QHeaderView::section { background-color:rgb(218, 232, 252);}");
     ui->memoryTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
         memory[i] = 0;
-        QTableWidgetItem *addr = new QTableWidgetItem(QString::number(i) + " :");
-        QTableWidgetItem *data = new QTableWidgetItem("0");
+        QTableWidgetItem *addr = new QTableWidgetItem(QString::number(i) + ":");
+        addr->setTextAlignment(Qt::AlignCenter);
         ui->memoryTable->setItem(i, 0, addr);
-        ui->memoryTable->setItem(i, 1, data);
     }
     memoryPortA = false;
     memoryPortB = false;
@@ -174,7 +166,6 @@ void MainWindow::compileProgram()
 
     instructionsString = code.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     numberOfInstructions = instructionsString.size();
-    qDebug() << "Number of instructions: " << numberOfInstructions;
 
     bool correctCode = true;
     //Checking format
@@ -194,7 +185,7 @@ void MainWindow::compileProgram()
                               regularInstruction1.match(instructionsString[i]).captured(4));
             instructions.append(instr);
 
-            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+            //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
         else if (regularInstruction2.match(instructionsString[i]).hasMatch())
         {
@@ -204,7 +195,7 @@ void MainWindow::compileProgram()
                               regularInstruction2.match(instructionsString[i]).captured(4));
             instructions.append(instr);
 
-            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+            //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
         else if (regularInstruction3.match(instructionsString[i]).hasMatch())
         {
@@ -214,7 +205,7 @@ void MainWindow::compileProgram()
                               regularInstruction3.match(instructionsString[i]).captured(4));
             instructions.append(instr);
 
-            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+            //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
         else if (regularInstruction4.match(instructionsString[i]).hasMatch())
         {
@@ -224,11 +215,11 @@ void MainWindow::compileProgram()
                               regularInstruction4.match(instructionsString[i]).captured(4));
             instructions.append(instr);
 
-            qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+            //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
         else
         {
-            qDebug() << "Instruction number " + QString::number(i) + " is NOT correct!!!";
+            writeOutputMessage("Instruction number " + QString::number(i) + " is NOT correct!!!");
             correctCode = false;
         }
 
@@ -268,7 +259,8 @@ void MainWindow::compileProgram()
     {
         if (numberOfInstructions > 0)
         {
-            ui->compileOutput->setText("Code is compiled successfuly.");
+            writeOutputMessage("Code is compiled successfuly.");
+            writeOutputMessage("Number of instructions: " + QString::number(numberOfInstructions));
             ui->startButton->setEnabled(true);
             ui->clkButton->setEnabled(false);
             ui->skipButton->setEnabled(false);
@@ -276,12 +268,12 @@ void MainWindow::compileProgram()
         }
         else
         {
-            ui->compileOutput->setText("You have to enter the program code before compiling.");
+            writeOutputMessage("You have to enter the program code before compiling.");
         }
     }
     else
     {
-        ui->compileOutput->setText("Code contains errors.");
+        writeOutputMessage("Code contains errors.");
         //clear all created elements of instructions list
         instructions.clear();
     }
@@ -318,7 +310,7 @@ void MainWindow::on_clkButton_clicked()
         }
 		else
 		{
-			qDebug() << "All reservation stations for next instruction in queue are busy -> stall.";
+            writeOutputMessage("All reservation stations for next instruction in queue are busy -> stall.");
 		}
     }
     else
@@ -449,7 +441,7 @@ void MainWindow::on_startButton_clicked()
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(true);
     ui->skipButton->setEnabled(true);
-    ui->compileOutput->setText("");
+    //ui->compileOutput->setText("");
     ui->clkLabel->setText("Clock cycle: " + QString::number(clkCycle));
 }
 
@@ -462,7 +454,7 @@ void MainWindow::on_resetButton_clicked()
     showMemory();
     nextInstruction = 0;
     code = "";
-    ui->compileOutput->setText("");
+    //ui->compileOutput->setText("");
     ui->startButton->setEnabled(true);
     ui->clkButton->setEnabled(false);
     ui->skipButton->setEnabled(false);
@@ -595,7 +587,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
                 }
             }
             if (sameAddr)
-                qDebug() << "Load is waiting for stores with same addresses to finish (preventing hazards).";
+                writeOutputMessage("Load is waiting for stores with same addresses to finish (preventing hazards).");
             else
             {
                 //everything with address is ok
@@ -633,7 +625,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
             }
         }
         else
-            qDebug() << "Load is waiting for address register to become available.";
+            writeOutputMessage("Load is waiting for address register to become available.");
     }
     else
         qDebug() << "Problem with registers in instructions.";
@@ -679,7 +671,7 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
                 }
             }
             if (sameAddr)
-                qDebug() << "Store is waiting for loads and stores with same addresses to finish (preventing hazards).";
+                writeOutputMessage("Store is waiting for loads and stores with same addresses to finish (preventing hazards).");
             else
             {
                 //everything with address is ok
@@ -731,7 +723,7 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
             }
         }
         else
-            qDebug() << "Load is waiting for address register to become available.";
+            writeOutputMessage("Store is waiting for address register to become available.");
     }
     else
         qDebug() << "Problem with registers in instructions.";
@@ -1252,6 +1244,7 @@ void MainWindow::showMemory()
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
         QTableWidgetItem *data= new QTableWidgetItem(QString::number(memory[i]));
+        data->setTextAlignment(Qt::AlignCenter);
         ui->memoryTable->setItem(i, 1, data);
     }
     QTableWidgetItem *portA = new QTableWidgetItem("Port A");
@@ -1330,3 +1323,9 @@ void MainWindow::resetProcessor()
     memoryPortB = false;
 }
 
+void MainWindow::writeOutputMessage(QString mess)
+{
+    qDebug() << mess;
+    ui->compileOutput->append(mess);
+    ui->compileOutput->append("---------------------------------");
+}

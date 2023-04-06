@@ -30,6 +30,7 @@ public:
     void showResStations();
     void showMemory();
     void resetProcessor();
+    void writeOutputMessage(QString mess);
 
 private slots:
     void on_compileButton_clicked();

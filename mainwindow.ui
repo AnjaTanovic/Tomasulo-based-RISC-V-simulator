@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1270</width>
-    <height>745</height>
+    <width>1236</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,14 +17,15 @@
    <widget class="QLabel" name="load_0">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>460</y>
-      <width>54</width>
+      <x>985</x>
+      <y>458</y>
+      <width>61</width>
       <height>18</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Courier New</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -38,14 +39,15 @@
    <widget class="QLabel" name="load_1">
     <property name="geometry">
      <rect>
-      <x>990</x>
+      <x>985</x>
       <y>435</y>
-      <width>54</width>
+      <width>61</width>
       <height>18</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Courier New</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -59,14 +61,15 @@
    <widget class="QLabel" name="load_2">
     <property name="geometry">
      <rect>
-      <x>990</x>
+      <x>985</x>
       <y>410</y>
-      <width>54</width>
+      <width>61</width>
       <height>18</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Courier New</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -80,14 +83,15 @@
    <widget class="QLabel" name="load_3">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>360</y>
-      <width>54</width>
+      <x>983</x>
+      <y>362</y>
+      <width>65</width>
       <height>18</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Courier New</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -101,14 +105,15 @@
    <widget class="QLabel" name="load_4">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>385</y>
-      <width>54</width>
+      <x>985</x>
+      <y>386</y>
+      <width>61</width>
       <height>18</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Courier New</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -144,11 +149,16 @@
    <widget class="QLabel" name="queue_5">
     <property name="geometry">
      <rect>
-      <x>618</x>
-      <y>90</y>
-      <width>99</width>
+      <x>602</x>
+      <y>94</y>
+      <width>127</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -160,11 +170,16 @@
    <widget class="QLabel" name="queue_4">
     <property name="geometry">
      <rect>
-      <x>618</x>
-      <y>115</y>
-      <width>99</width>
+      <x>602</x>
+      <y>118</y>
+      <width>127</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -176,11 +191,16 @@
    <widget class="QLabel" name="queue_3">
     <property name="geometry">
      <rect>
-      <x>618</x>
-      <y>139</y>
-      <width>99</width>
+      <x>602</x>
+      <y>142</y>
+      <width>127</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -192,11 +212,16 @@
    <widget class="QLabel" name="queue_2">
     <property name="geometry">
      <rect>
-      <x>618</x>
-      <y>163</y>
-      <width>99</width>
-      <height>18</height>
+      <x>602</x>
+      <y>164</y>
+      <width>127</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -208,11 +233,16 @@
    <widget class="QLabel" name="queue_1">
     <property name="geometry">
      <rect>
-      <x>618</x>
+      <x>602</x>
       <y>188</y>
-      <width>99</width>
-      <height>17</height>
+      <width>129</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -224,11 +254,16 @@
    <widget class="QLabel" name="queue_0">
     <property name="geometry">
      <rect>
-      <x>618</x>
+      <x>602</x>
       <y>212</y>
-      <width>99</width>
-      <height>17</height>
+      <width>127</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -241,10 +276,15 @@
     <property name="geometry">
      <rect>
       <x>900</x>
-      <y>461</y>
-      <width>59</width>
+      <y>458</y>
+      <width>61</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -257,10 +297,15 @@
     <property name="geometry">
      <rect>
       <x>900</x>
-      <y>436</y>
-      <width>59</width>
-      <height>18</height>
+      <y>434</y>
+      <width>63</width>
+      <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -274,9 +319,14 @@
      <rect>
       <x>434</x>
       <y>188</y>
-      <width>69</width>
-      <height>17</height>
+      <width>65</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -289,10 +339,15 @@
     <property name="geometry">
      <rect>
       <x>434</x>
-      <y>163</y>
-      <width>69</width>
+      <y>164</y>
+      <width>65</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -305,10 +360,15 @@
     <property name="geometry">
      <rect>
       <x>434</x>
-      <y>139</y>
-      <width>69</width>
+      <y>142</y>
+      <width>65</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -322,9 +382,14 @@
      <rect>
       <x>434</x>
       <y>212</y>
-      <width>69</width>
-      <height>17</height>
+      <width>65</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -337,10 +402,15 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>484</y>
-      <width>29</width>
-      <height>20</height>
+      <y>482</y>
+      <width>27</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -354,9 +424,14 @@
      <rect>
       <x>370</x>
       <y>457</y>
-      <width>29</width>
+      <width>25</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -369,10 +444,15 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>430</y>
-      <width>29</width>
-      <height>20</height>
+      <y>434</y>
+      <width>27</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -385,10 +465,15 @@
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>484</y>
+      <y>480</y>
       <width>63</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -406,6 +491,11 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
     <property name="text">
      <string>TextLabel</string>
     </property>
@@ -417,10 +507,15 @@
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>430</y>
+      <y>434</y>
       <width>63</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -433,10 +528,15 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>484</y>
+      <y>480</y>
       <width>63</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -454,6 +554,11 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
     <property name="text">
      <string>TextLabel</string>
     </property>
@@ -465,10 +570,15 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>430</y>
+      <y>434</y>
       <width>63</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -486,6 +596,11 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
     <property name="text">
      <string>TextLabel</string>
     </property>
@@ -498,9 +613,14 @@
      <rect>
       <x>640</x>
       <y>473</y>
-      <width>69</width>
-      <height>16</height>
+      <width>67</width>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -515,8 +635,13 @@
       <x>640</x>
       <y>450</y>
       <width>69</width>
-      <height>16</height>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -531,8 +656,13 @@
       <x>710</x>
       <y>473</y>
       <width>63</width>
-      <height>16</height>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -547,8 +677,13 @@
       <x>710</x>
       <y>450</y>
       <width>63</width>
-      <height>16</height>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -562,9 +697,14 @@
      <rect>
       <x>900</x>
       <y>411</y>
-      <width>59</width>
+      <width>63</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -578,9 +718,14 @@
      <rect>
       <x>900</x>
       <y>386</y>
-      <width>59</width>
+      <width>63</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -593,10 +738,15 @@
     <property name="geometry">
      <rect>
       <x>900</x>
-      <y>360</y>
-      <width>59</width>
+      <y>362</y>
+      <width>63</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -608,11 +758,16 @@
    <widget class="QLabel" name="storeReg_0">
     <property name="geometry">
      <rect>
-      <x>828</x>
-      <y>461</y>
-      <width>69</width>
+      <x>832</x>
+      <y>458</y>
+      <width>65</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -624,11 +779,16 @@
    <widget class="QLabel" name="storeReg_1">
     <property name="geometry">
      <rect>
-      <x>828</x>
-      <y>436</y>
-      <width>69</width>
+      <x>830</x>
+      <y>434</y>
+      <width>67</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -640,11 +800,16 @@
    <widget class="QLabel" name="storeReg_2">
     <property name="geometry">
      <rect>
-      <x>828</x>
+      <x>832</x>
       <y>411</y>
-      <width>69</width>
+      <width>65</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -656,11 +821,16 @@
    <widget class="QLabel" name="storeReg_3">
     <property name="geometry">
      <rect>
-      <x>828</x>
+      <x>832</x>
       <y>386</y>
-      <width>69</width>
+      <width>65</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -672,11 +842,16 @@
    <widget class="QLabel" name="storeReg_4">
     <property name="geometry">
      <rect>
-      <x>828</x>
-      <y>360</y>
-      <width>69</width>
+      <x>832</x>
+      <y>362</y>
+      <width>65</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -688,9 +863,9 @@
    <widget class="QTableWidget" name="memoryTable">
     <property name="geometry">
      <rect>
-      <x>1080</x>
+      <x>1078</x>
       <y>50</y>
-      <width>131</width>
+      <width>137</width>
       <height>561</height>
      </rect>
     </property>
@@ -699,6 +874,14 @@
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="tabKeyNavigation">
      <bool>true</bool>
@@ -716,11 +899,14 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1080</x>
+      <x>1078</x>
       <y>620</y>
-      <width>131</width>
+      <width>137</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -730,10 +916,15 @@
     <property name="geometry">
      <rect>
       <x>434</x>
-      <y>115</y>
-      <width>69</width>
+      <y>118</y>
+      <width>65</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -746,10 +937,15 @@
     <property name="geometry">
      <rect>
       <x>434</x>
-      <y>90</y>
-      <width>69</width>
+      <y>94</y>
+      <width>65</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -761,11 +957,16 @@
    <widget class="QLabel" name="xq_0">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>368</x>
       <y>212</y>
       <width>63</width>
-      <height>17</height>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -777,11 +978,16 @@
    <widget class="QLabel" name="xq_1">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>368</x>
       <y>188</y>
       <width>63</width>
-      <height>17</height>
+      <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -793,11 +999,16 @@
    <widget class="QLabel" name="xq_2">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>163</y>
+      <x>368</x>
+      <y>164</y>
       <width>63</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -809,11 +1020,16 @@
    <widget class="QLabel" name="xq_3">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>139</y>
+      <x>368</x>
+      <y>142</y>
       <width>63</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -825,11 +1041,16 @@
    <widget class="QLabel" name="xq_4">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>115</y>
+      <x>368</x>
+      <y>118</y>
       <width>63</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -842,7 +1063,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>660</y>
+      <y>668</y>
       <width>586</width>
       <height>33</height>
      </rect>
@@ -931,11 +1152,16 @@
    <widget class="QLabel" name="xq_5">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>90</y>
+      <x>368</x>
+      <y>94</y>
       <width>63</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -950,8 +1176,13 @@
       <x>610</x>
       <y>470</y>
       <width>29</width>
-      <height>20</height>
+      <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -966,11 +1197,19 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>351</x>
-      <y>530</y>
-      <width>69</width>
+      <x>349</x>
+      <y>534</y>
+      <width>71</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -982,11 +1221,19 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>427</x>
-      <y>530</y>
-      <width>68</width>
+      <x>425</x>
+      <y>534</y>
+      <width>71</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -998,11 +1245,19 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>502</x>
-      <y>530</y>
-      <width>68</width>
+      <x>501</x>
+      <y>534</y>
+      <width>71</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -1015,10 +1270,18 @@
     <property name="geometry">
      <rect>
       <x>624</x>
-      <y>520</y>
-      <width>69</width>
+      <y>518</y>
+      <width>73</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -1030,11 +1293,19 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>520</y>
-      <width>68</width>
+      <x>702</x>
+      <y>518</y>
+      <width>71</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::NoSelection</enum>
@@ -1044,7 +1315,7 @@
     <property name="geometry">
      <rect>
       <x>19</x>
-      <y>510</y>
+      <y>508</y>
       <width>291</width>
       <height>29</height>
      </rect>
@@ -1057,9 +1328,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>22</y>
+      <y>32</y>
       <width>291</width>
-      <height>481</height>
+      <height>471</height>
      </rect>
     </property>
     <property name="maximumSize">
@@ -1079,7 +1350,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>550</y>
+      <y>562</y>
       <width>291</width>
       <height>101</height>
      </rect>
@@ -1101,6 +1372,57 @@
       <family>Courier New</family>
       <pointsize>10</pointsize>
      </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>540</y>
+      <width>291</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: rgb(218, 232, 252);</string>
+    </property>
+    <property name="text">
+     <string>Application Output</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>291</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: rgb(218, 232, 252);</string>
+    </property>
+    <property name="text">
+     <string>Code editor</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1164,19 +1486,11 @@
    <zorder>mul_0</zorder>
    <zorder>mul_1</zorder>
    <zorder>compileButton</zorder>
+   <zorder>lineEdit</zorder>
+   <zorder>compileOutput</zorder>
+   <zorder>lineEdit_2</zorder>
    <zorder>codeTextEdit</zorder>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1270</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
   <include location="resource.qrc"/>
