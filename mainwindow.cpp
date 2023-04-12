@@ -30,7 +30,7 @@ bool memoryPortB;
 bool divisionByZero = false;
 
 /********************************************************
-compile is not real compiling, change word
+try mov, bnz..
 ********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
@@ -137,6 +137,23 @@ MainWindow::MainWindow(QWidget *parent)
     showResStations();
     showMemory();
     ui->clkLabel->setText("");
+
+    QMessageBox::information(this, "Welcome to Tomasulo-based RISC-V simulator!",
+                          "<p align=center><b>Welcome to the Tomasulo-based RISC-V Simulator!</b></p>"
+                          "<p align=justify>\nThank you for choosing this RISC-V simulator application. Application shows RISC-V "
+                          "architecture based on Tomasulo algorithm and to help you get started with using the app,"
+                          "a brief guide will be presented.</p>"
+                          "<p align=justify>\nThis app is designed to illustrate a Tomasulo-based RISC V processor, "
+                          "featuring various visual components such as reservation stations, instruction queues, "
+                          "load/store buffers and memory. To begin, input your desired assembler commands in the "
+                          "designated command window and compile it accordingly."
+                          "\nThe app currently supports basic RISC-V format instructions, including "
+                          "add, addi, sub, mul, div, ld, and sd. Once your commands are compiled, you can "
+                          "either click the 'Clk' button to see how the simulator works in real-time or choose to "
+                          "skip 10 clocks for a quicker view, using 'Skip 10 clocks' button. The diagram will provide "
+                          "you with a detailed illustration of all activities happening "
+                          "within the processor, such as instruction execution and data transfers.</p>"
+                          "<p>Enjoy using RISC-V simulator!</p>");
 }
 
 MainWindow::~MainWindow()
@@ -1084,10 +1101,16 @@ void MainWindow::showResStations()
                 targetLabel->setText("-");
             labelName = "addsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsAddSub[i].getVj());
+            if (stationsAddSub[i].getQj() == "")
+                targetLabel->setText(stationsAddSub[i].getVj());
+            else
+                targetLabel->setText(stationsAddSub[i].getQj());
             labelName = "addsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsAddSub[i].getVk());
+            if (stationsAddSub[i].getQk() == "")
+                targetLabel->setText(stationsAddSub[i].getVk());
+            else
+                targetLabel->setText(stationsAddSub[i].getQk());
 
             if (stationsAddSub[i].getWorking())
             {
@@ -1164,10 +1187,16 @@ void MainWindow::showResStations()
                     targetLabel->setText("/");
             labelName = "mulsVj_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsMulDiv[i].getVj());
+            if (stationsMulDiv[i].getQj() == "")
+                targetLabel->setText(stationsMulDiv[i].getVj());
+            else
+                targetLabel->setText(stationsMulDiv[i].getQj());
             labelName = "mulsVk_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            targetLabel->setText(stationsMulDiv[i].getVk());
+            if (stationsMulDiv[i].getQk() == "")
+                targetLabel->setText(stationsMulDiv[i].getVk());
+            else
+                targetLabel->setText(stationsMulDiv[i].getQk());
 
             if (stationsMulDiv[i].getWorking())
             {
