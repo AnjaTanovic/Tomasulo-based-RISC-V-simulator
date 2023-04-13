@@ -43,6 +43,7 @@ private slots:
 
     void on_skipButton_clicked();
 
+    void on_codeTextEdit_textChanged();
 private:
     Ui::MainWindow *ui;
 };

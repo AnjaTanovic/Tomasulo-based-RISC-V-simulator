@@ -14,6 +14,7 @@
 
 int clkCycle = 0;
 QStringList instructionsString;
+QStringList instructionsStringEmpty;
 QString code;
 int nextQueueInstruction = 0; //shows which instruction from code is next to be inserted in queue
 int nextInstruction = 0;
@@ -141,7 +142,7 @@ MainWindow::MainWindow(QWidget *parent)
     QMessageBox::information(this, "Welcome to Tomasulo-based RISC-V simulator!",
                           "<p align=center><b>Welcome to the Tomasulo-based RISC-V Simulator!</b></p>"
                           "<p align=justify>\nThank you for choosing this RISC-V simulator application. Application shows RISC-V "
-                          "architecture based on Tomasulo algorithm and to help you get started with using the app,"
+                          "architecture based on Tomasulo algorithm and to help you get started with using the app, "
                           "a brief guide will be presented.</p>"
                           "<p align=justify>\nThis app is designed to illustrate a Tomasulo-based RISC V processor, "
                           "featuring various visual components such as reservation stations, instruction queues, "
@@ -181,103 +182,104 @@ void MainWindow::compileProgram()
     ui->resetButton->setEnabled(false);
     ui->clkLabel->setText("");
 
+    instructionsStringEmpty = code.split(QLatin1Char('\n'));
     instructionsString = code.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     numberOfInstructions = instructionsString.size();
 
+    bool incorrectInstruction;
+    QList<QTextEdit::ExtraSelection> extraSelections;
+
     bool correctCode = true;
     //Checking format
-    for (int i = 0; i < instructionsString.size(); i++)
+    for (int i = 0; i < instructionsStringEmpty.size(); i++)
     {
         QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([xX][0-5])\\s*$");
         QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
         QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
         QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([0-9]+)\\s*$");
 
-        if (regularInstruction1.match(instructionsString[i]).hasMatch())
+        if (regularInstruction1.match(instructionsStringEmpty[i]).hasMatch())
         {
 
-            Instruction instr(regularInstruction1.match(instructionsString[i]).captured(1),
-                              regularInstruction1.match(instructionsString[i]).captured(2),
-                              regularInstruction1.match(instructionsString[i]).captured(3),
-                              regularInstruction1.match(instructionsString[i]).captured(4));
+            Instruction instr(regularInstruction1.match(instructionsStringEmpty[i]).captured(1),
+                              regularInstruction1.match(instructionsStringEmpty[i]).captured(2),
+                              regularInstruction1.match(instructionsStringEmpty[i]).captured(3),
+                              regularInstruction1.match(instructionsStringEmpty[i]).captured(4));
             instructions.append(instr);
+            incorrectInstruction = false;
 
             //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
-        else if (regularInstruction2.match(instructionsString[i]).hasMatch())
+        else if (regularInstruction2.match(instructionsStringEmpty[i]).hasMatch())
         {
-            Instruction instr(regularInstruction2.match(instructionsString[i]).captured(1),
-                              regularInstruction2.match(instructionsString[i]).captured(2),
-                              regularInstruction2.match(instructionsString[i]).captured(3),
-                              regularInstruction2.match(instructionsString[i]).captured(4));
+            Instruction instr(regularInstruction2.match(instructionsStringEmpty[i]).captured(1),
+                              regularInstruction2.match(instructionsStringEmpty[i]).captured(2),
+                              regularInstruction2.match(instructionsStringEmpty[i]).captured(3),
+                              regularInstruction2.match(instructionsStringEmpty[i]).captured(4));
             instructions.append(instr);
+            incorrectInstruction = false;
 
             //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
-        else if (regularInstruction3.match(instructionsString[i]).hasMatch())
+        else if (regularInstruction3.match(instructionsStringEmpty[i]).hasMatch())
         {
-            Instruction instr(regularInstruction3.match(instructionsString[i]).captured(1),
-                              regularInstruction3.match(instructionsString[i]).captured(2),
-                              regularInstruction3.match(instructionsString[i]).captured(3),
-                              regularInstruction3.match(instructionsString[i]).captured(4));
+            Instruction instr(regularInstruction3.match(instructionsStringEmpty[i]).captured(1),
+                              regularInstruction3.match(instructionsStringEmpty[i]).captured(2),
+                              regularInstruction3.match(instructionsStringEmpty[i]).captured(3),
+                              regularInstruction3.match(instructionsStringEmpty[i]).captured(4));
             instructions.append(instr);
+            incorrectInstruction = false;
 
             //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
-        else if (regularInstruction4.match(instructionsString[i]).hasMatch())
+        else if (regularInstruction4.match(instructionsStringEmpty[i]).hasMatch())
         {
             Instruction instr("addi",
-                              regularInstruction4.match(instructionsString[i]).captured(2),
-                              regularInstruction4.match(instructionsString[i]).captured(3),
-                              regularInstruction4.match(instructionsString[i]).captured(4));
+                              regularInstruction4.match(instructionsStringEmpty[i]).captured(2),
+                              regularInstruction4.match(instructionsStringEmpty[i]).captured(3),
+                              regularInstruction4.match(instructionsStringEmpty[i]).captured(4));
             instructions.append(instr);
+            incorrectInstruction = false;
 
             //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+        }
+        else if (instructionsStringEmpty[i].isEmpty())
+        {
+            incorrectInstruction = false;
         }
         else
         {
-            writeOutputMessage("Instruction number " + QString::number(i) + " is NOT correct!!!");
+            writeOutputMessage("<p style=color:red>ERROR: Instruction number " + QString::number(i) + " is NOT correct!</p>");
+            incorrectInstruction = true;
             correctCode = false;
         }
 
+        //If command line is not correct mark it red
+        if (incorrectInstruction == true)
+        {
+            QTextCursor cursor = ui->codeTextEdit->textCursor();
+            cursor.movePosition(QTextCursor::Start);
+            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, i); // select line i+1
 
-        /********************************************************
-        If command line is not correct mark it red
-        ********************************************************/
+            QTextEdit::ExtraSelection selection;
+            QColor lineColor(QColor(Qt::red).lighter(160)); // set the background color to red
+            selection.format.setBackground(lineColor);
+            selection.cursor = cursor;
+            selection.cursor.select(QTextCursor::LineUnderCursor);
 
-        QList<QTextEdit::ExtraSelection> extraSelections;
-
-        QTextEdit::ExtraSelection textEdit;
-
-        QColor lineColor = QColor(Qt::red).lighter(160);
-
-        textEdit.format.setBackground(lineColor);
-        textEdit.format.setProperty(QTextFormat::FullWidthSelection, true);
-        textEdit.cursor = QTextCursor();
-        textEdit.cursor.clearSelection();
-        textEdit.cursor.movePosition(QTextCursor::Start);
-        textEdit.cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, 1);
-        extraSelections.append(textEdit);
-
-        ui->codeTextEdit->setExtraSelections(extraSelections);
-        ui->codeTextEdit->show();
-        //ui->codeTextEdit->insertPlainText("Hello");
-        //ui->codeTextEdit->append("Anja");
-        //qDebug() << "Underlined";
-        //ui->codeTextEdit->setTextColor(Qt::red);
-
-        /********************************************************
-        Code above is not working.
-        Try with changing whole string and print it again
-        with append
-        ********************************************************/
+            extraSelections.append(selection);
+        }
     }
+    // Apply the background color change to the QTextEdit widget
+    ui->codeTextEdit->setExtraSelections(extraSelections);
+
     if (correctCode)
     {
         if (numberOfInstructions > 0)
         {
             writeOutputMessage("Code is compiled successfuly.");
             writeOutputMessage("Number of instructions: " + QString::number(numberOfInstructions));
+            writeOutputMessage("---------------------------------");
             ui->startButton->setEnabled(true);
             ui->clkButton->setEnabled(false);
             ui->skipButton->setEnabled(false);
@@ -285,16 +287,16 @@ void MainWindow::compileProgram()
         }
         else
         {
-            writeOutputMessage("You have to enter the program code before compiling.");
+            writeOutputMessage("WARNING: You have to enter the program code before compiling.");
         }
     }
     else
     {
-        writeOutputMessage("Code contains errors.");
-        //clear all created elements of instructions list
-        instructions.clear();
-    }
+        writeOutputMessage("<p style=color:red>ERROR: Code contains errors.</p>");
+        writeOutputMessage("---------------------------------");
 
+        instructions.clear();   //clear all created elements of instructions list
+    }
 }
 
 void MainWindow::on_clkButton_clicked()
@@ -327,7 +329,7 @@ void MainWindow::on_clkButton_clicked()
         }
 		else
 		{
-            writeOutputMessage("All reservation stations for next instruction in queue are busy -> stall.");
+            writeOutputMessage("INFO: All reservation stations for next instruction in queue are busy -> stall.");
 		}
     }
     else
@@ -604,7 +606,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
                 }
             }
             if (sameAddr)
-                writeOutputMessage("Load is waiting for stores with same addresses to finish (preventing hazards).");
+                writeOutputMessage("INFO: Load is waiting for stores with same addresses to finish (preventing hazards).");
             else
             {
                 //everything with address is ok
@@ -642,7 +644,7 @@ bool MainWindow::fillReservationStationLoads(QString resReg, QString imm, QStrin
             }
         }
         else
-            writeOutputMessage("Load is waiting for address register to become available.");
+            writeOutputMessage("INFO: Load is waiting for address register to become available.");
     }
     else
         qDebug() << "Problem with registers in instructions.";
@@ -688,7 +690,7 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
                 }
             }
             if (sameAddr)
-                writeOutputMessage("Store is waiting for loads and stores with same addresses to finish (preventing hazards).");
+                writeOutputMessage("INFO: Store is waiting for loads and stores with same addresses to finish (preventing hazards).");
             else
             {
                 //everything with address is ok
@@ -740,7 +742,7 @@ bool MainWindow::fillReservationStationStores(QString vj, QString imm, QString a
             }
         }
         else
-            writeOutputMessage("Store is waiting for address register to become available.");
+            writeOutputMessage("INFO: Store is waiting for address register to become available.");
     }
     else
         qDebug() << "Problem with registers in instructions.";
@@ -1354,7 +1356,24 @@ void MainWindow::resetProcessor()
 
 void MainWindow::writeOutputMessage(QString mess)
 {
-    qDebug() << mess;
+    //qDebug() << mess;
     ui->compileOutput->append(mess);
-    ui->compileOutput->append("---------------------------------");
 }
+
+void MainWindow::on_codeTextEdit_textChanged()
+{
+    QTextCursor cursor = ui->codeTextEdit->textCursor();
+
+    QList<QTextEdit::ExtraSelection> oldSelections = ui->codeTextEdit->extraSelections();
+    QTextEdit::ExtraSelection selection;
+    QColor lineColor(QColor(Qt::white).lighter(160));// set the background color to white
+    selection.format.setBackground(lineColor);
+    selection.cursor = cursor;
+    selection.cursor.select(QTextCursor::LineUnderCursor);
+
+    // Apply the background color change to the QTextEdit widget
+    oldSelections.append(selection);
+    ui->codeTextEdit->setExtraSelections(oldSelections);
+
+}
+
