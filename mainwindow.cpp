@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QMessageBox>
+#include <QTextBlock>
 
 int clkCycle = 0;
 QStringList instructionsString;
@@ -29,10 +30,6 @@ int memory[MEMORY_SIZE];
 bool memoryPortA;
 bool memoryPortB;
 bool divisionByZero = false;
-
-/********************************************************
-add numbers on code editor
-********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -138,6 +135,8 @@ MainWindow::MainWindow(QWidget *parent)
     showResStations();
     showMemory();
     ui->clkLabel->setText("");
+
+
 
     QMessageBox::information(this, "Welcome to Tomasulo-based RISC-V simulator!",
                           "<p align=center><b>Welcome to the Tomasulo-based RISC-V Simulator!</b></p>"
@@ -1382,3 +1381,126 @@ void MainWindow::on_codeTextEdit_textChanged()
     ui->codeTextEdit->setExtraSelections(oldSelections);
 }
 
+
+/********************************************************
+Numbers on code editor
+********************************************************/
+
+//QTextDocument* document;
+//QTextDocument* document_new;
+//int blockCount = 0;
+/*
+    QString text = ui->codeTextEdit->toPlainText();
+    QStringList linesText = text.split(QLatin1Char('\n'));
+
+    document = ui->codeTextEdit->document();
+    int blockCount = document_new->blockCount();
+
+
+
+        QRegularExpression regularInstruction1("^([0-9]+:[ ])(.*)\\s*$");
+        QRegularExpression regularInstruction2("^([0-9]*:)(.*)\\s*$");
+
+        for (int i = 0; i < blockCount; i++) {
+            int lineNumber = i + 1;
+            QString lineNumberText = QString::number(lineNumber) + ": ";
+
+            QTextCursor cursor = ui->codeTextEdit->textCursor();
+            cursor.movePosition(QTextCursor::Start);
+            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, i); // select line i+1
+
+            if (regularInstruction1.match(linesText[i]).hasMatch())   //ok
+            {
+                qDebug() << "ok";
+            }
+            else if (regularInstruction1.match(linesText[i]).hasMatch()) //problem
+            {
+                cursor.select(QTextCursor::LineUnderCursor);
+                cursor.removeSelectedText();
+                cursor.insertText(lineNumberText + regularInstruction1.match(linesText[i]).captured(2));
+                qDebug() << "ok k";
+            }
+            else    //problem
+            {
+                cursor.select(QTextCursor::LineUnderCursor);
+                cursor.removeSelectedText();
+                cursor.insertText(lineNumberText);
+                qDebug() << "prob";
+            }
+
+
+
+    }
+
+        document_new = ui->codeTextEdit->document();
+        int blockCount_new = document_new->blockCount();
+        //QTextCursor cursor = ui->codeTextEdit->textCursor();
+        QString text = ui->codeTextEdit->toPlainText();
+
+
+        QRegularExpression regularInstruction1("^([0-9]+:[ ])(.*)\\s*$"); //correct line
+        QRegularExpression regularInstruction2("^([0-9]*:)(.*)\\s*$"); //line changed with backspace or delete
+        QRegularExpression regularInstruction3("^([^ ]*)\\s*$"); //line without number
+
+
+            blockCount = blockCount_new;
+            document = document_new;
+
+            QStringList linesText = text.split(QLatin1Char('\n'));
+
+            for (int i = 0; i < blockCount; i++) {
+                int lineNumber = i + 1;
+                QString lineNumberText = QString::number(lineNumber) + ": ";
+
+                QTextCursor cursor = ui->codeTextEdit->textCursor();
+                cursor.movePosition(QTextCursor::Start);
+                cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, i); // select line i+1
+
+                if (regularInstruction1.match(linesText[i]).hasMatch())   //new line with old line number
+                {
+                    qDebug() << "ok";
+                }
+                else if (regularInstruction2.match(linesText[i]).hasMatch())
+                {
+                    cursor.select(QTextCursor::LineUnderCursor);
+                    cursor.removeSelectedText();
+                    cursor.insertText(lineNumberText + regularInstruction2.match(linesText[i]).captured(2));
+                    qDebug() << "ok solved backspace";
+                }
+                else if (regularInstruction3.match(linesText[i]).hasMatch())
+                {
+                    cursor.select(QTextCursor::LineUnderCursor);
+                    cursor.removeSelectedText();
+                    cursor.insertText(lineNumberText + regularInstruction3.match(linesText[i]).captured(2));
+                    qDebug() << "ok solved";
+                }
+                else    //new line without line number
+                {
+
+                    cursor.select(QTextCursor::LineUnderCursor);
+                    cursor.removeSelectedText();
+                    cursor.insertText(lineNumberText);
+                    qDebug() << "prob";
+                }
+
+            }
+
+        text = ui->codeTextEdit->toPlainText();
+
+        cursor = ui->codeTextEdit->textCursor();
+
+        int currentPostion = cursor.positionInBlock();
+
+        // Find the position of the ":" character on the current line
+        cursor.movePosition(QTextCursor::StartOfLine);
+        int numPos = text.indexOf(':', cursor.positionInBlock());
+        int numPosAll = text.indexOf(':', cursor.position());
+
+        if (currentPostion <= numPos + 1)
+        {
+            //cursor.movePosition(QTextCursor::Start);
+            //cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, numPos + 1);
+            cursor.setPosition(numPosAll + 2, QTextCursor::MoveAnchor);
+            ui->codeTextEdit->setTextCursor(cursor);
+        }
+*/
