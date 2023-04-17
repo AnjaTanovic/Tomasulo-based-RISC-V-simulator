@@ -195,7 +195,7 @@ void MainWindow::compileProgram()
         QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([xX][0-5])\\s*$");
         QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
         QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
-        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([0-9]+)\\s*$");
+        QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*(-?[0-9]+)\\s*$");
         QRegularExpression regularInstruction5("^\\s*(nop|NOP)\\s*$");
 
         if (regularInstruction1.match(instructionsStringEmpty[i]).hasMatch())
