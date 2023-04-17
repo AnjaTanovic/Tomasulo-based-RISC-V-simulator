@@ -31,7 +31,7 @@ bool memoryPortB;
 bool divisionByZero = false;
 
 /********************************************************
-try mov, bnz..
+add numbers on code editor
 ********************************************************/
 
 MainWindow::MainWindow(QWidget *parent)
@@ -144,12 +144,12 @@ MainWindow::MainWindow(QWidget *parent)
                           "<p align=justify>\nThank you for choosing this RISC-V simulator application. Application shows RISC-V "
                           "architecture based on Tomasulo algorithm and to help you get started with using the app, "
                           "a brief guide will be presented.</p>"
-                          "<p align=justify>\nThis app is designed to illustrate a Tomasulo-based RISC V processor, "
+                          "<p align=justify>\nThis app is designed to illustrate simple Tomasulo-based RISC V processor, "
                           "featuring various visual components such as reservation stations, instruction queues, "
                           "load/store buffers and memory. To begin, input your desired assembler commands in the "
                           "designated command window and compile it accordingly."
                           "\nThe app currently supports basic RISC-V format instructions, including "
-                          "add, addi, sub, mul, div, ld, and sd. Once your commands are compiled, you can "
+                          "add, addi, sub, mul, div, ld, sd and nop. Once your commands are compiled, you can "
                           "either click the 'Clk' button to see how the simulator works in real-time or choose to "
                           "skip 10 clocks for a quicker view, using 'Skip 10 clocks' button. The diagram will provide "
                           "you with a detailed illustration of all activities happening "
@@ -197,6 +197,7 @@ void MainWindow::compileProgram()
         QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
         QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
         QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([0-9]+)\\s*$");
+        QRegularExpression regularInstruction5("^\\s*(nop|NOP)\\s*$");
 
         if (regularInstruction1.match(instructionsStringEmpty[i]).hasMatch())
         {
@@ -243,13 +244,24 @@ void MainWindow::compileProgram()
 
             //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
         }
+        else if (regularInstruction5.match(instructionsStringEmpty[i]).hasMatch())
+        {
+            Instruction instr("nop",
+                              "",
+                              "",
+                              "");
+            instructions.append(instr);
+            incorrectInstruction = false;
+
+            //qDebug() << "Instruction number " + QString::number(i) + " is correct.";
+        }
         else if (instructionsStringEmpty[i].isEmpty())
         {
             incorrectInstruction = false;
         }
         else
         {
-            writeOutputMessage("<p style=color:red>ERROR: Instruction number " + QString::number(i) + " is NOT correct!</p>");
+            writeOutputMessage("<p style=color:red>ERROR: Instruction number " + QString::number(i) + " is not correct!</p>");
             incorrectInstruction = true;
             correctCode = false;
         }
@@ -314,6 +326,8 @@ void MainWindow::on_clkButton_clicked()
             stationNotBusy = fillReservationStationLoads(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "sd")
             stationNotBusy = fillReservationStationStores(instr.getReg1(), instr.getReg2(), instr.getReg3());
+        else if (instr.getOp() == "nop")
+            stationNotBusy = true;
         else
             stationNotBusy = fillReservationStationMults(instr.getOp(), instr.getReg1(), instr.getReg2(), instr.getReg3());
 
@@ -830,10 +844,6 @@ void MainWindow::checkReservationStations()
     //For all busy and working reservation stations -> check if they have finished their work
     //For all busy reservation stations which are waiting for operands -> check if operands are computed in this cycle
 
-    /********************************************************
-    Analyze war waw rar and raw hazards
-    ********************************************************/
-
     QList<QPair<int, QString>> cdb; //common data bus: (result, station name)
 
     //Step 1: Check if working stations finished and send results on CDB
@@ -880,7 +890,7 @@ void MainWindow::checkReservationStations()
                 if (stationsMulDiv[i].getAtCycle() == DIV_CLK_LATENCY)
                 {
                     //If division by zero occurs -> reset simulator
-                    if (stationsMulDiv[i].getQk().toInt() == 0)
+                    if (stationsMulDiv[i].getVk().toInt() == 0)
                     {
                         QMessageBox::critical(this, "Division By Zero",
                                               "Division by zero is undefined. Application is not able to continue execution. "
@@ -984,10 +994,6 @@ void MainWindow::checkReservationStations()
                 stationsMulDiv[i].setWorking(true);
         }
     }
-
-    /********************************************************
-    This logic will prioritize loads for memory (make these accesses fair)
-    ********************************************************/
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
     {
@@ -1097,7 +1103,7 @@ void MainWindow::showResStations()
         {
             labelName = "addsOp_" + QString::number(i);
             targetLabel = ui->addsOp_0->parentWidget()->findChild<QLabel*>(labelName);
-            if (stationsAddSub[i].getOp() == "add")
+            if (stationsAddSub[i].getOp() == "add" || stationsAddSub[i].getOp() == "addi")
                 targetLabel->setText("+");
             else
                 targetLabel->setText("-");
@@ -1117,7 +1123,7 @@ void MainWindow::showResStations()
             if (stationsAddSub[i].getWorking())
             {
                 QTableWidgetItem *add;
-                if (stationsAddSub[i].getOp() == "add")
+                if (stationsAddSub[i].getOp() == "add" || stationsAddSub[i].getOp() == "addi")
                     add = new QTableWidgetItem("+");
                 else
                     add = new QTableWidgetItem("-");
@@ -1374,6 +1380,5 @@ void MainWindow::on_codeTextEdit_textChanged()
     // Apply the background color change to the QTextEdit widget
     oldSelections.append(selection);
     ui->codeTextEdit->setExtraSelections(oldSelections);
-
 }
 

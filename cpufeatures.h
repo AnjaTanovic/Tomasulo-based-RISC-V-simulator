@@ -19,8 +19,8 @@
 #define MUL_CLK_LATENCY 10
 #define DIV_CLK_LATENCY 40
 
-#define ADDSUB_STATIONS_NAME "Add"
-#define MULDIV_STATIONS_NAME "Mul"
+#define ADDSUB_STATIONS_NAME "AddSub"
+#define MULDIV_STATIONS_NAME "MulDiv"
 #define LOAD_STATIONS_NAME "Load"
 #define STORE_STATIONS_NAME "Store"
 

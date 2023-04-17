@@ -314,7 +314,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="x_1">
+   <widget class="QLabel" name="x_4">
     <property name="geometry">
      <rect>
       <x>434</x>
@@ -335,7 +335,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="x_2">
+   <widget class="QLabel" name="x_3">
     <property name="geometry">
      <rect>
       <x>434</x>
@@ -356,7 +356,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="x_3">
+   <widget class="QLabel" name="x_2">
     <property name="geometry">
      <rect>
       <x>434</x>
@@ -377,7 +377,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="x_0">
+   <widget class="QLabel" name="x_5">
     <property name="geometry">
      <rect>
       <x>434</x>
@@ -912,11 +912,11 @@
      <enum>QAbstractItemView::NoSelection</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="x_4">
+   <widget class="QLabel" name="x_1">
     <property name="geometry">
      <rect>
       <x>434</x>
-      <y>118</y>
+      <y>120</y>
       <width>65</width>
       <height>17</height>
      </rect>
@@ -933,7 +933,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="x_5">
+   <widget class="QLabel" name="x_0">
     <property name="geometry">
      <rect>
       <x>434</x>
@@ -954,7 +954,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="xq_0">
+   <widget class="QLabel" name="xq_5">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -975,7 +975,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="xq_1">
+   <widget class="QLabel" name="xq_4">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -996,7 +996,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="xq_2">
+   <widget class="QLabel" name="xq_3">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -1017,7 +1017,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="xq_3">
+   <widget class="QLabel" name="xq_2">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -1038,7 +1038,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="xq_4">
+   <widget class="QLabel" name="xq_1">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -1149,7 +1149,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="xq_5">
+   <widget class="QLabel" name="xq_0">
     <property name="geometry">
      <rect>
       <x>368</x>
@@ -1443,10 +1443,10 @@
    <zorder>queue_0</zorder>
    <zorder>storeAddr_0</zorder>
    <zorder>storeAddr_1</zorder>
-   <zorder>x_1</zorder>
-   <zorder>x_2</zorder>
+   <zorder>x_4</zorder>
    <zorder>x_3</zorder>
-   <zorder>x_0</zorder>
+   <zorder>x_2</zorder>
+   <zorder>x_5</zorder>
    <zorder>addsOp_0</zorder>
    <zorder>addsOp_1</zorder>
    <zorder>addsOp_2</zorder>
@@ -1471,14 +1471,14 @@
    <zorder>storeReg_4</zorder>
    <zorder>memoryTable</zorder>
    <zorder>portTable</zorder>
-   <zorder>x_4</zorder>
-   <zorder>x_5</zorder>
-   <zorder>xq_0</zorder>
-   <zorder>xq_1</zorder>
-   <zorder>xq_2</zorder>
-   <zorder>xq_3</zorder>
-   <zorder>xq_4</zorder>
+   <zorder>x_1</zorder>
+   <zorder>x_0</zorder>
    <zorder>xq_5</zorder>
+   <zorder>xq_4</zorder>
+   <zorder>xq_3</zorder>
+   <zorder>xq_2</zorder>
+   <zorder>xq_1</zorder>
+   <zorder>xq_0</zorder>
    <zorder>mulsOp_0</zorder>
    <zorder>add_0</zorder>
    <zorder>add_1</zorder>
