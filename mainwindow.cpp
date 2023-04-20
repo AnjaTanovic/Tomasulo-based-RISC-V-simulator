@@ -29,7 +29,7 @@ QList<Register> registers;
 int memory[MEMORY_SIZE];
 bool memoryPortA;
 bool memoryPortB;
-bool divisionByZero = false;
+bool error = false;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -173,7 +173,7 @@ void MainWindow::compileProgram()
     nextInstruction = 0;
     instructions.clear();
     resetProcessor();
-    divisionByZero = false;
+    error = false;
 
     ui->startButton->setEnabled(false);
     ui->clkButton->setEnabled(false);
@@ -382,7 +382,7 @@ void MainWindow::on_clkButton_clicked()
 
     clkCycle++;
 
-    if (divisionByZero)
+    if (error)
     {
         on_resetButton_clicked();
         ui->resetButton->setEnabled(false);
@@ -396,7 +396,7 @@ void MainWindow::on_skipButton_clicked()
     for (int i = 0; i < 10; i++)
     {
         on_clkButton_clicked();
-        if (divisionByZero)
+        if (error)
                 break;
     }
 }
@@ -894,7 +894,7 @@ void MainWindow::checkReservationStations()
                         QMessageBox::critical(this, "Division By Zero",
                                               "Division by zero is undefined. Application is not able to continue execution. "
                                               "Click OK to reset simulator.");
-                        divisionByZero = true;
+                        error = true;
                     }
                     int result = stationsMulDiv[i].calculate();
                     cdb.append(QPair<int, QString>(result, MULDIV_STATIONS_NAME + QString::number(i)));
@@ -903,7 +903,7 @@ void MainWindow::checkReservationStations()
         }
     }
 
-    if (divisionByZero)
+    if (error)
         return;
 
     for (int i = 0; i < NUM_OF_LOAD_STATIONS; i++)
@@ -919,12 +919,25 @@ void MainWindow::checkReservationStations()
                 else
                     qDebug() << "Problem in memory port logic.";
 
-                int result = memory[stationsLoad[i].getAddr()];
-                stationsLoad[i].read();
-                cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
+                if (stationsLoad[i].getAddr() >= MEMORY_SIZE)
+                {
+                    QMessageBox::critical(this, "Address out of range",
+                                          "Memory address is out of range. Application is not able to continue execution. "
+                                          "Click OK to reset simulator.");
+                    error = true;
+                }
+                else
+                {
+                    int result = memory[stationsLoad[i].getAddr()];
+                    stationsLoad[i].read();
+                    cdb.append(QPair<int, QString>(result, LOAD_STATIONS_NAME + QString::number(i)));
+                }
             }
         }
     }
+
+    if (error)
+        return;
 
     for (int i = 0; i < NUM_OF_STORE_STATIONS; i++)
     {
@@ -939,12 +952,25 @@ void MainWindow::checkReservationStations()
                 else
                     qDebug() << "Problem in memory port logic.";
 
-                memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
-                stationsStore[i].write();
-                //store does not send anything on cdb
+                if (stationsStore[i].getAddr() >= MEMORY_SIZE)
+                {
+                    QMessageBox::critical(this, "Address out of range",
+                                          "Memory address is out of range. Application is not able to continue execution. "
+                                          "Click OK to reset simulator.");
+                    error = true;
+                }
+                else
+                {
+                    memory[stationsStore[i].getAddr()] = stationsStore[i].getVj().toInt();
+                    stationsStore[i].write();
+                    //store does not send anything on cdb
+                }
             }
         }
     }
+
+    if (error)
+        return;
 
     //Step 2: Registers and reservation stations which are waiting, takes what is for them
 
