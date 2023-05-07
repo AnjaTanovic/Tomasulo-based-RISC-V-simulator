@@ -148,7 +148,7 @@ MainWindow::MainWindow(QWidget *parent)
                           "load/store buffers and memory. To begin, input your desired assembler commands in the "
                           "designated command window and compile it accordingly."
                           "\nThe app currently supports basic RISC-V format instructions, including "
-                          "add, addi, sub, mul, div, ld, sd and nop. Once your commands are compiled, you can "
+                          "add, addi, sub, mul, div, lw, sw and nop. Once your commands are compiled, you can "
                           "either click the 'Clk' button to see how the simulator works in real-time or choose to "
                           "skip 10 clocks for a quicker view, using 'Skip 10 clocks' button. The diagram will provide "
                           "you with a detailed illustration of all activities happening "
@@ -193,8 +193,8 @@ void MainWindow::compileProgram()
     for (int i = 0; i < instructionsStringEmpty.size(); i++)
     {
         QRegularExpression regularInstruction1("^\\s*(add|sub|mul|div|ADD|SUB|MUL|DIV)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*([xX][0-5])\\s*$");
-        QRegularExpression regularInstruction2("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
-        QRegularExpression regularInstruction3("^\\s*(sd|ld|SD|LD)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
+        QRegularExpression regularInstruction2("^\\s*(sw|lw|SW|LW)\\s+([xX][0-5])\\s*,\\s*([0-9]+)\\s*,\\s*([xX][0-5])\\s*$");
+        QRegularExpression regularInstruction3("^\\s*(sw|lw|SW|LW)\\s+([xX][0-5])\\s*,\\s*([0-9]+)[(]\\s*([xX][0-5])\\s*[)]\\s*$");
         QRegularExpression regularInstruction4("^\\s*(addi|ADDI)\\s+([xX][0-5])\\s*,\\s*([xX][0-5])\\s*,\\s*(-?[0-9]+)\\s*$");
         QRegularExpression regularInstruction5("^\\s*(nop|NOP)\\s*$");
 
@@ -321,9 +321,9 @@ void MainWindow::on_clkButton_clicked()
         bool stationNotBusy;
         if (instr.getOp() == "add" || instr.getOp() == "sub" || instr.getOp() == "addi")
             stationNotBusy = fillReservationStationAdders(instr.getOp(), instr.getReg1(), instr.getReg2(), instr.getReg3());
-        else if (instr.getOp() == "ld")
+        else if (instr.getOp() == "lw")
             stationNotBusy = fillReservationStationLoads(instr.getReg1(), instr.getReg2(), instr.getReg3());
-        else if (instr.getOp() == "sd")
+        else if (instr.getOp() == "sw")
             stationNotBusy = fillReservationStationStores(instr.getReg1(), instr.getReg2(), instr.getReg3());
         else if (instr.getOp() == "nop")
             stationNotBusy = true;
@@ -1078,7 +1078,9 @@ void MainWindow::checkReservationStations()
         {
             if (registers[i].getQ() == cdb[j].second)
             {
-                registers[i].setValue(cdb[j].first);
+                //skip registers[0] because the value of register x0 cannot be changed
+                if (i != 0)
+                    registers[i].setValue(cdb[j].first);
                 registers[i].setQ("");
             }
         }
